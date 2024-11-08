@@ -1,1 +1,5 @@
-/target
+target/
+.direnv/
+output.png
+test.ssl
+art/

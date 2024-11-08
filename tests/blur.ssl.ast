@@ -1,0 +1,101 @@
+Expr "(0.5 - (x*x+y*y)*(x*x+y*y)*5) + {0.5, x-0.5, y+0.5}":
+  BinExpr:
+    operation: Add
+    left:
+      Expr "(0.5 - (x*x+y*y)*(x*x+y*y)*5)":
+        ParenExpr:
+          Expr "0.5 - (x*x+y*y)*(x*x+y*y)*5":
+            BinExpr:
+              operation: Sub
+              left:
+                Expr "0.5":
+                  NumberExpr: 0.5
+              right:
+                Expr "(x*x+y*y)*(x*x+y*y)*5":
+                  BinExpr:
+                    operation: Mul
+                    left:
+                      Expr "(x*x+y*y)*(x*x+y*y)":
+                        BinExpr:
+                          operation: Mul
+                          left:
+                            Expr "(x*x+y*y)":
+                              ParenExpr:
+                                Expr "x*x+y*y":
+                                  BinExpr:
+                                    operation: Add
+                                    left:
+                                      Expr "x*x":
+                                        BinExpr:
+                                          operation: Mul
+                                          left:
+                                            Expr "x":
+                                              X
+                                          right:
+                                            Expr "x":
+                                              X
+                                    right:
+                                      Expr "y*y":
+                                        BinExpr:
+                                          operation: Mul
+                                          left:
+                                            Expr "y":
+                                              Y
+                                          right:
+                                            Expr "y":
+                                              Y
+                          right:
+                            Expr "(x*x+y*y)":
+                              ParenExpr:
+                                Expr "x*x+y*y":
+                                  BinExpr:
+                                    operation: Add
+                                    left:
+                                      Expr "x*x":
+                                        BinExpr:
+                                          operation: Mul
+                                          left:
+                                            Expr "x":
+                                              X
+                                          right:
+                                            Expr "x":
+                                              X
+                                    right:
+                                      Expr "y*y":
+                                        BinExpr:
+                                          operation: Mul
+                                          left:
+                                            Expr "y":
+                                              Y
+                                          right:
+                                            Expr "y":
+                                              Y
+                    right:
+                      Expr "5":
+                        NumberExpr: 5.0
+    right:
+      Expr "{0.5, x-0.5, y+0.5}":
+        ColorExpr:
+          R:
+            Expr "0.5":
+              NumberExpr: 0.5
+          G:
+            Expr "x-0.5":
+              BinExpr:
+                operation: Sub
+                left:
+                  Expr "x":
+                    X
+                right:
+                  Expr "0.5":
+                    NumberExpr: 0.5
+          B:
+            Expr "y+0.5":
+              BinExpr:
+                operation: Add
+                left:
+                  Expr "y":
+                    Y
+                right:
+                  Expr "0.5":
+                    NumberExpr: 0.5

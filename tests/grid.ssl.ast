@@ -1,0 +1,48 @@
+Expr "{ x % 0.1, y % 0.1, (x+y)/40 } * 10":
+  BinExpr:
+    operation: Mul
+    left:
+      Expr "{ x % 0.1, y % 0.1, (x+y)/40 }":
+        ColorExpr:
+          R:
+            Expr "x % 0.1":
+              BinExpr:
+                operation: Mod
+                left:
+                  Expr "x":
+                    X
+                right:
+                  Expr "0.1":
+                    NumberExpr: 0.1
+          G:
+            Expr "y % 0.1":
+              BinExpr:
+                operation: Mod
+                left:
+                  Expr "y":
+                    Y
+                right:
+                  Expr "0.1":
+                    NumberExpr: 0.1
+          B:
+            Expr "(x+y)/40":
+              BinExpr:
+                operation: Div
+                left:
+                  Expr "(x+y)":
+                    ParenExpr:
+                      Expr "x+y":
+                        BinExpr:
+                          operation: Add
+                          left:
+                            Expr "x":
+                              X
+                          right:
+                            Expr "y":
+                              Y
+                right:
+                  Expr "40":
+                    NumberExpr: 40.0
+    right:
+      Expr "10":
+        NumberExpr: 10.0

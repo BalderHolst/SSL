@@ -1,0 +1,62 @@
+Expr "{
+    ((x^2 + y^2)^0.5*3 % 1),
+    0.1,
+    0.1
+}
+":
+  ColorExpr:
+    R:
+      Expr "((x^2 + y^2)^0.5*3 % 1)":
+        ParenExpr:
+          Expr "(x^2 + y^2)^0.5*3 % 1":
+            BinExpr:
+              operation: Mod
+              left:
+                Expr "(x^2 + y^2)^0.5*3":
+                  BinExpr:
+                    operation: Mul
+                    left:
+                      Expr "(x^2 + y^2)^0.5":
+                        BinExpr:
+                          operation: Pow
+                          left:
+                            Expr "(x^2 + y^2)":
+                              ParenExpr:
+                                Expr "x^2 + y^2":
+                                  BinExpr:
+                                    operation: Add
+                                    left:
+                                      Expr "x^2":
+                                        BinExpr:
+                                          operation: Pow
+                                          left:
+                                            Expr "x":
+                                              X
+                                          right:
+                                            Expr "2":
+                                              NumberExpr: 2.0
+                                    right:
+                                      Expr "y^2":
+                                        BinExpr:
+                                          operation: Pow
+                                          left:
+                                            Expr "y":
+                                              Y
+                                          right:
+                                            Expr "2":
+                                              NumberExpr: 2.0
+                          right:
+                            Expr "0.5":
+                              NumberExpr: 0.5
+                    right:
+                      Expr "3":
+                        NumberExpr: 3.0
+              right:
+                Expr "1":
+                  NumberExpr: 1.0
+    G:
+      Expr "0.1":
+        NumberExpr: 0.1
+    B:
+      Expr "0.1":
+        NumberExpr: 0.1

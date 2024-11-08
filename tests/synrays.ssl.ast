@@ -1,0 +1,34 @@
+Expr "(y % (0.1*x + 0.02))*6":
+  BinExpr:
+    operation: Mul
+    left:
+      Expr "(y % (0.1*x + 0.02))":
+        ParenExpr:
+          Expr "y % (0.1*x + 0.02)":
+            BinExpr:
+              operation: Mod
+              left:
+                Expr "y":
+                  Y
+              right:
+                Expr "(0.1*x + 0.02)":
+                  ParenExpr:
+                    Expr "0.1*x + 0.02":
+                      BinExpr:
+                        operation: Add
+                        left:
+                          Expr "0.1*x":
+                            BinExpr:
+                              operation: Mul
+                              left:
+                                Expr "0.1":
+                                  NumberExpr: 0.1
+                              right:
+                                Expr "x":
+                                  X
+                        right:
+                          Expr "0.02":
+                            NumberExpr: 0.02
+    right:
+      Expr "6":
+        NumberExpr: 6.0
