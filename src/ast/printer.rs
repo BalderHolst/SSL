@@ -111,6 +111,28 @@ impl Visitor for Printer {
         self.unindent();
     }
 
+    fn visit_if_expr(&mut self, expr: &super::IfExpr) {
+        vprintln!(self, "IfExpr:");
+        self.indent();
+
+        vprintln!(self, "Condition:");
+        self.indent();
+        self.visit_expr(&expr.cond);
+        self.unindent();
+
+        vprintln!(self, "True:");
+        self.indent();
+        self.visit_expr(&expr.true_expr);
+        self.unindent();
+
+        vprintln!(self, "False:");
+        self.indent();
+        self.visit_expr(&expr.false_expr);
+        self.unindent();
+
+        self.unindent();
+    }
+
     fn visit_x_expr(&mut self) {
         vprintln!(self, "X")
     }

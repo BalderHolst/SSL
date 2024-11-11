@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, NegExpr, ParenExpr},
+    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr},
     lexer::{Token, TokenKind},
     text::Span,
 };
@@ -131,6 +131,38 @@ impl Parser {
         }
     }
 
+    fn parse_if_expr(&mut self) -> Expr {
+        let start_span = self.current().unwrap().span.clone();
+
+        self.consume(); // Consume 'if'
+
+        self.looking_for.push(TokenKind::Then);
+        let cond = self.parse_expr();
+        self.looking_for.pop();
+
+        self.consume(); // Consume 'then'
+
+        self.looking_for.push(TokenKind::Else);
+        let true_expr = self.parse_expr();
+        self.looking_for.pop();
+
+        self.consume(); // Consume 'else'
+
+        self.looking_for.push(TokenKind::End);
+        let false_expr = self.parse_expr();
+        self.looking_for.pop();
+
+        let end = self.consume(); // Consume 'end'
+
+        Expr {
+            kind: ExprKind::If(IfExpr::new(cond, true_expr, false_expr)),
+            span: Span {
+                end: end.map_or(self.source.len() - 1, |t| t.span.end),
+                start: start_span.start,
+            },
+        }
+    }
+
     fn parse_parenthesized_expr(&mut self) -> Expr {
         let start_span = self.current().unwrap().span.clone();
 
@@ -178,6 +210,7 @@ impl Parser {
             TokenKind::Lparen => self.parse_parenthesized_expr(),
             TokenKind::Lbrace => self.parse_color(),
             TokenKind::Bar => self.parse_abs_expr(),
+            TokenKind::If => self.parse_if_expr(),
             TokenKind::X => {
                 self.consume();
                 expr(ExprKind::X)

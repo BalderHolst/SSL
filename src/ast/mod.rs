@@ -25,6 +25,7 @@ impl Expr {
 #[derive(Debug)]
 pub enum ExprKind {
     Bin(BinExpr),
+    If(IfExpr),
     Number(NumberExpr),
     Color(ColorExpr),
     Paren(ParenExpr),
@@ -85,6 +86,23 @@ pub struct BinExpr {
     pub op: BinOp,
     pub lhs: Box<Expr>,
     pub rhs: Box<Expr>,
+}
+
+#[derive(Debug)]
+pub struct IfExpr {
+    pub cond: Box<Expr>,
+    pub true_expr: Box<Expr>,
+    pub false_expr: Box<Expr>,
+}
+
+impl IfExpr {
+    pub fn new(cond: Expr, true_expr: Expr, false_expr: Expr) -> Self {
+        Self {
+            cond: Box::new(cond),
+            true_expr: Box::new(true_expr),
+            false_expr: Box::new(false_expr),
+        }
+    }
 }
 
 #[derive(Debug)]

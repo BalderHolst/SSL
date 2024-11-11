@@ -30,6 +30,11 @@ pub enum TokenKind {
 
     Comma,
 
+    If,
+    Then,
+    Else,
+    End,
+
     Whitespace,
 
     Other(char),
@@ -54,6 +59,10 @@ impl TokenKind {
             TokenKind::And => 13,
             TokenKind::Comma => 14,
             TokenKind::Whitespace => 15,
+            TokenKind::If => 16,
+            TokenKind::Then => 17,
+            TokenKind::Else => 18,
+            TokenKind::End => 19,
             TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
             TokenKind::Other(c) => (*c) as usize,
         }
@@ -88,6 +97,12 @@ impl Lexer {
 
     fn current(&self) -> Option<char> {
         self.chars.get(self.cursor).copied()
+    }
+
+    fn peak(&self, offset: isize) -> Option<char> {
+        self.chars
+            .get((self.cursor as isize + offset) as usize)
+            .copied()
     }
 
     fn span(&self, start: usize) -> Span {
@@ -155,12 +170,17 @@ impl Iterator for Lexer {
                 })
             }
             c => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Other(c),
-                    span: self.span(token_start),
-                })
-            }
+                #[rustfmt::skip]
+                let (size, token) = match [self.peak(0), self.peak(1), self.peak(2), self.peak(3)] {
+                    [Some('i'), Some('f'),         _,         _] => (2, token(self, TokenKind::If)),
+                    [Some('t'), Some('h'), Some('e'), Some('n')] => (4, token(self, TokenKind::Then)),
+                    [Some('e'), Some('l'), Some('s'), Some('e')] => (4, token(self, TokenKind::Else)),
+                    [Some('e'), Some('n'), Some('d'),         _] => (3, token(self, TokenKind::End)),
+                    _ => return token(self, TokenKind::Other(c)),
+                };
+                self.cursor += size;
+                token
+            },
         }
     }
 }

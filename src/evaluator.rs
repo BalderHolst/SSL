@@ -6,6 +6,14 @@ use crate::ast::{BinOp, Expr, ExprKind};
 pub enum Result {
     Color(Color),
     Number(f64),
+    Bool(bool),
+}
+
+fn bool_to_f64(b: bool) -> f64 {
+    match b {
+        true => 1.0,
+        false => -1.0,
+    }
 }
 
 impl Result {
@@ -13,6 +21,7 @@ impl Result {
         match self {
             Result::Color(c) => (c.r + c.g + c.b) / 3.0,
             Result::Number(n) => *n,
+            Result::Bool(b) => bool_to_f64(*b),
         }
     }
 
@@ -24,6 +33,19 @@ impl Result {
                 g: *n,
                 b: *n,
             },
+            Result::Bool(b) => Color {
+                r: bool_to_f64(*b),
+                g: bool_to_f64(*b),
+                b: bool_to_f64(*b),
+            },
+        }
+    }
+
+    fn as_bool(&self) -> bool {
+        match self {
+            Result::Color(_) => self.as_number() >= 0.0,
+            Result::Number(n) => *n >= 0.0,
+            Result::Bool(b) => *b,
         }
     }
 
@@ -41,6 +63,7 @@ impl Result {
                 zero_if_nan(&mut c.b);
             }
             Result::Number(n) => zero_if_nan(n),
+            Result::Bool(_) => {}
         }
     }
 }
@@ -80,6 +103,13 @@ macro_rules! number {
     };
 }
 
+macro_rules! bool {
+    ($n:expr) => {
+        Result::Bool($n)
+    };
+}
+
+
 macro_rules! impl_trait_op {
     ($trait:ident, $method:ident, $struct:ident) => {
         impl $trait for $struct {
@@ -96,6 +126,19 @@ macro_rules! impl_trait_op {
                         color!(n.$method(c.r), n.$method(c.g), n.$method(c.b))
                     }
                     (Result::Number(n1), Result::Number(n2)) => number!(n1.$method(n2)),
+                    (Result::Color(c), Result::Bool(b)) => {
+                        let b = bool_to_f64(b);
+                        color!(c.r.$method(b), c.g.$method(b), c.b.$method(b))
+                    },
+                    (Result::Number(n), Result::Bool(b)) => number!(n.$method(bool_to_f64(b))),
+                    (Result::Bool(b), Result::Color(c)) => {
+                        let b = bool_to_f64(b);
+                        color!(b.$method(c.r), b.$method(c.g), b.$method(c.b))
+                    },
+                    (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(b).$method(n)),
+                    (Result::Bool(b1), Result::Bool(b2)) => {
+                        number!(bool_to_f64(b1).$method(bool_to_f64(b2)))
+                    }
                 }
             }
         }
@@ -119,6 +162,17 @@ impl Result {
                 color!(n % c.r, n % c.g, n % c.b)
             }
             (Result::Number(n1), Result::Number(n2)) => number!(n1 % n2),
+            (Result::Color(c), Result::Bool(b)) => {
+                let b = bool_to_f64(b);
+                color!(c.r % b, c.g % b, c.b % b)
+            },
+            (Result::Number(n), Result::Bool(b)) => number!(n % bool_to_f64(b)),
+            (Result::Bool(b), Result::Color(c)) => {
+                let b = bool_to_f64(*b);
+                color!(b % c.r, b % c.g, b % c.b)
+            },
+            (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(*b) % n),
+            (Result::Bool(b1), Result::Bool(b2)) => bool!(b1 ^ b2),
         }
     }
 
@@ -134,6 +188,17 @@ impl Result {
                 color!(n.powf(c.r), n.powf(c.g), n.powf(c.b))
             }
             (Result::Number(n1), Result::Number(n2)) => number!(n1.powf(n2)),
+            (Result::Color(c), Result::Bool(b)) => {
+                let b = bool_to_f64(b);
+                color!(c.r.powf(b), c.g.powf(b), c.b.powf(b))
+            },
+            (Result::Number(n), Result::Bool(b)) => number!(n.powf(bool_to_f64(b))),
+            (Result::Bool(b), Result::Color(c)) => {
+                let b = bool_to_f64(*b);
+                color!(b.powf(c.r), b.powf(c.g), b.powf(c.b))
+            },
+            (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(*b).powf(n)),
+            (Result::Bool(b1), Result::Bool(b2)) => bool!(b1 ^ b2),
         }
     }
 
@@ -143,6 +208,7 @@ impl Result {
                 color!(c.r.abs(), c.g.abs(), c.b.abs())
             }
             Result::Number(n) => number!(n.abs()),
+            Result::Bool(_) => number!(self.as_number().abs()),
         }
     }
 
@@ -189,6 +255,14 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
         ExprKind::Number(n) => number!(*n),
         ExprKind::X => number!(x),
         ExprKind::Y => number!(y),
+        ExprKind::If(e) => {
+            let cond = eval_expr(&e.cond, x, y);
+            if cond.as_bool() {
+                eval_expr(&e.true_expr, x, y)
+            } else {
+                eval_expr(&e.false_expr, x, y)
+            }
+        }
     };
     res.nan_to_zero();
     res
