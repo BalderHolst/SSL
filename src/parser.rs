@@ -100,7 +100,7 @@ impl Parser {
         let start_span = self.current().unwrap().span.clone();
         self.consume(); // Consume '-'
         let inner = self.parse_expr();
-        let end = self.peak(-1); // Consume right parenthesis
+        let end = self.peak(-1);
 
         Expr {
             kind: ExprKind::Neg(NegExpr::new(inner)),
@@ -117,12 +117,10 @@ impl Parser {
         self.consume(); // Consume left |
 
         self.looking_for.push(TokenKind::Bar);
-
         let inner = self.parse_expr();
-
         self.looking_for.pop();
 
-        let end = self.consume(); // Consume right parenthesis
+        let end = self.consume(); // Consume right |
 
         Expr {
             kind: ExprKind::Abs(AbsExpr::new(inner)),
@@ -139,9 +137,7 @@ impl Parser {
         self.consume(); // Consume left parenthesis
 
         self.looking_for.push(TokenKind::Rparen);
-
         let inner = self.parse_expr();
-
         self.looking_for.pop();
 
         let end = self.consume(); // Consume right parenthesis
@@ -223,9 +219,13 @@ impl Parser {
             TokenKind::Slash => BinOp::Div,
             TokenKind::Procent => BinOp::Mod,
             TokenKind::Carrot => BinOp::Pow,
+            TokenKind::Bar => BinOp::Max,
+            TokenKind::And => BinOp::Min,
             tk => choice! {tk.as_usize() ,
                 1 => BinOp::Add,
                 1 => BinOp::Sub,
+                1 => BinOp::Min,
+                1 => BinOp::Max,
                 3 => BinOp::Mul,
                 3 => BinOp::Div,
                 3 => BinOp::Mod,
@@ -263,7 +263,6 @@ impl Parser {
         };
 
         if self.is_at_interest() {
-            self.looking_for.pop();
             return left;
         }
 

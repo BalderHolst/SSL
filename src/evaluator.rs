@@ -1,8 +1,8 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::{cmp::Ordering, ops::{Add, Div, Mul, Sub}};
 
 use crate::ast::{BinOp, Expr, ExprKind};
 
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum Result {
     Color(Color),
     Number(f64),
@@ -28,7 +28,6 @@ impl Result {
     }
 
     fn nan_to_zero(&mut self) {
-
         fn zero_if_nan(n: &mut f64) {
             if n.is_nan() {
                 *n = 0.0;
@@ -40,14 +39,13 @@ impl Result {
                 zero_if_nan(&mut c.r);
                 zero_if_nan(&mut c.g);
                 zero_if_nan(&mut c.b);
-            },
+            }
             Result::Number(n) => zero_if_nan(n),
         }
-
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
@@ -55,7 +53,7 @@ pub struct Color {
 }
 
 fn sigmoid(x: f64) -> f64 {
-    1.0/(1.0 + f64::exp(-2.0*x+0.5))
+    1.0 / (1.0 + f64::exp(-2.0 * x + 0.5))
 }
 
 impl Color {
@@ -109,11 +107,10 @@ impl_trait_op!(Mul, mul, Result);
 impl_trait_op!(Div, div, Result);
 
 impl Result {
-
     fn fmod(&self, other: Self) -> Self {
         match (self, other) {
             (Result::Color(c1), Result::Color(c2)) => {
-                color!(c1.r % c2.r , c1.g % c2.g, c1.b % c2.b)
+                color!(c1.r % c2.r, c1.g % c2.g, c1.b % c2.b)
             }
             (Result::Color(c), Result::Number(n)) => {
                 color!(c.r % n, c.g % n, c.b % n)
@@ -128,7 +125,7 @@ impl Result {
     fn pow(&self, other: Self) -> Self {
         match (self, other) {
             (Result::Color(c1), Result::Color(c2)) => {
-                color!(c1.r.powf(c2.r) , c1.g.powf(c2.g), c1.b.powf(c2.b))
+                color!(c1.r.powf(c2.r), c1.g.powf(c2.g), c1.b.powf(c2.b))
             }
             (Result::Color(c), Result::Number(n)) => {
                 color!(c.r.powf(n), c.g.powf(n), c.b.powf(n))
@@ -149,8 +146,20 @@ impl Result {
         }
     }
 
-}
+    fn max(&self, other: &Self) -> Self {
+        match self.partial_cmp(other) {
+            Some(Ordering::Less) => other.clone(),
+            _ => self.clone(),
+        }
+    }
 
+    fn min(&self, other: &Self) -> Self {
+        match self.partial_cmp(other) {
+            Some(Ordering::Greater) => other.clone(),
+            _ => self.clone(),
+        }
+    }
+}
 
 fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
     let mut res = match &expr.kind {
@@ -163,7 +172,9 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
                 BinOp::Mul => l * r,
                 BinOp::Div => l / r,
                 BinOp::Mod => l.fmod(r),
-                BinOp::Pow => l.pow(r)
+                BinOp::Pow => l.pow(r),
+                BinOp::Max => l.max(&r),
+                BinOp::Min => l.min(&r),
             }
         }
         ExprKind::Color(c) => {

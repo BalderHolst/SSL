@@ -22,6 +22,7 @@ pub enum TokenKind {
     Lbrace,
     Rbrace,
     Bar,
+    And,
 
     X,
     Y,
@@ -50,8 +51,9 @@ impl TokenKind {
             TokenKind::Lbrace => 10,
             TokenKind::Rbrace => 11,
             TokenKind::Bar => 12,
-            TokenKind::Comma => 13,
-            TokenKind::Whitespace => 14,
+            TokenKind::And => 13,
+            TokenKind::Comma => 14,
+            TokenKind::Whitespace => 15,
             TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
             TokenKind::Other(c) => (*c) as usize,
         }
@@ -127,6 +129,7 @@ impl Iterator for Lexer {
             '}' => token(self, TokenKind::Rbrace),
             ',' => token(self, TokenKind::Comma),
             '|' => token(self, TokenKind::Bar),
+            '&' => token(self, TokenKind::And),
             'x' | 'X' => token(self, TokenKind::X),
             'y' | 'Y' => token(self, TokenKind::Y),
             '0'..='9' => {
