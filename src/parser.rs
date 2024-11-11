@@ -11,6 +11,7 @@ pub struct Parser {
     tokens: Vec<Token>,
     cursor: usize,
     looking_for: Vec<TokenKind>,
+    seed: usize,
 }
 
 const DEFAULT_EXPR_KIND: ExprKind = ExprKind::Number(1.0);
@@ -39,6 +40,7 @@ impl Parser {
             source,
             cursor: 0,
             looking_for: vec![],
+            seed: 0,
         }
     }
 
@@ -48,6 +50,11 @@ impl Parser {
             return None;
         }
         self.tokens.get(cursor as usize)
+    }
+
+    fn seed(&mut self) -> usize {
+        self.seed += 1;
+        self.seed
     }
 
     fn current(&self) -> Option<&Token> {
@@ -227,11 +234,12 @@ impl Parser {
             tk => {
                 let n = tk.as_usize();
                 let number = tk.as_f64();
-                let expr = choice! { n,
+                let expr = choice! { n + self.seed(),
                     3 => self.parse_color(),
                     3 => expr(ExprKind::X),
                     3 => expr(ExprKind::Y),
                     3 => expr(ExprKind::Number(number)),
+                    2 => self.parse_if_expr(),
                     1 => self.parse_neg_expr(),
                     1 => self.parse_parenthesized_expr(),
                 };
@@ -241,7 +249,8 @@ impl Parser {
         }
     }
 
-    fn get_bin_op(&self) -> BinOp {
+    fn get_bin_op(&mut self) -> BinOp {
+        let seed = self.seed();
         let Some(token) = self.current() else {
             return DEFAULT_BIN_OP;
         };
@@ -257,24 +266,25 @@ impl Parser {
             TokenKind::Less => BinOp::LessThan,
             TokenKind::Greater => BinOp::GreaterThan,
             TokenKind::Equal => BinOp::Equal,
-            tk => choice! {tk.as_usize() ,
-                1 => BinOp::Add,
-                1 => BinOp::Sub,
-                3 => BinOp::Mul,
-                3 => BinOp::Div,
-                3 => BinOp::Mod,
+            tk => choice! {tk.as_usize() + seed,
+                3 => BinOp::Add,
+                3 => BinOp::Sub,
+                5 => BinOp::Mul,
+                5 => BinOp::Div,
+                5 => BinOp::Mod,
                 2 => BinOp::Pow,
 
-                1 => BinOp::And,
-                1 => BinOp::Or,
-                1 => BinOp::LessThan,
-                1 => BinOp::GreaterThan,
+                0 => BinOp::And,
+                0 => BinOp::Or,
+                0 => BinOp::LessThan,
+                0 => BinOp::GreaterThan,
                 0 => BinOp::Equal,
             },
         }
     }
 
-    fn is_at_interest(&self) -> bool {
+    fn is_at_interest(&mut self) -> bool {
+        let seed = self.seed();
         if let Some(interest) = self.looking_for.last() {
             if let Some(token) = self.current() {
 
@@ -283,7 +293,7 @@ impl Parser {
                 }
 
                 if matches!(&token.kind, TokenKind::Other(_)) {
-                    return choice!{ token.kind.as_usize(),
+                    return choice!{ token.kind.as_usize() + seed,
                         1 => true,
                         3 => false,
                     };
