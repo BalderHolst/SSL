@@ -140,6 +140,15 @@ impl Result {
         }
     }
 
+    fn abs(&self) -> Self {
+        match self {
+            Result::Color(c) => {
+                color!(c.r.abs(), c.g.abs(), c.b.abs())
+            }
+            Result::Number(n) => number!(n.abs()),
+        }
+    }
+
 }
 
 
@@ -165,6 +174,7 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
         }
         ExprKind::Paren(e) => eval_expr(&e.inner, x, y),
         ExprKind::Neg(e) => eval_expr(&e.inner, x, y) * number!(-1.0),
+        ExprKind::Abs(e) => eval_expr(&e.inner, x, y).abs(),
         ExprKind::Number(n) => number!(*n),
         ExprKind::X => number!(x),
         ExprKind::Y => number!(y),

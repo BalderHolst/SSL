@@ -21,6 +21,7 @@ pub enum TokenKind {
     Rparen,
     Lbrace,
     Rbrace,
+    Bar,
 
     X,
     Y,
@@ -48,8 +49,9 @@ impl TokenKind {
             TokenKind::Rparen => 9,
             TokenKind::Lbrace => 10,
             TokenKind::Rbrace => 11,
-            TokenKind::Comma => 12,
-            TokenKind::Whitespace => 13,
+            TokenKind::Bar => 12,
+            TokenKind::Comma => 13,
+            TokenKind::Whitespace => 14,
             TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
             TokenKind::Other(c) => (*c) as usize,
         }
@@ -61,7 +63,6 @@ impl TokenKind {
             tk => (tk.as_usize() % 10) as f64 / 10.0,
         }
     }
-
 }
 
 pub struct Lexer {
@@ -104,98 +105,30 @@ impl Iterator for Lexer {
 
     fn next(&mut self) -> Option<Self::Item> {
         let token_start = self.cursor;
+
+        let token = |lexer: &mut Self, tk: TokenKind| {
+            lexer.next();
+            Some(Token {
+                kind: tk,
+                span: lexer.span(token_start),
+            })
+        };
+
         match self.current()? {
-            '+' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Plus,
-                    span: self.span(token_start),
-                })
-            }
-            '-' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Minus,
-                    span: self.span(token_start),
-                })
-            }
-            '*' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Asterisk,
-                    span: self.span(token_start),
-                })
-            }
-            '/' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Slash,
-                    span: self.span(token_start),
-                })
-            }
-            '%' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Procent,
-                    span: self.span(token_start),
-                })
-            }
-            '^' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Carrot,
-                    span: self.span(token_start),
-                })
-            }
-            '(' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Lparen,
-                    span: self.span(token_start),
-                })
-            }
-            ')' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Rparen,
-                    span: self.span(token_start),
-                })
-            }
-            '{' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Lbrace,
-                    span: self.span(token_start),
-                })
-            }
-            '}' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Rbrace,
-                    span: self.span(token_start),
-                })
-            }
-            'x' | 'X' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::X,
-                    span: self.span(token_start),
-                })
-            }
-            'y' | 'Y' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Y,
-                    span: self.span(token_start),
-                })
-            }
-            ',' => {
-                self.next();
-                Some(Token {
-                    kind: TokenKind::Comma,
-                    span: self.span(token_start),
-                })
-            }
+            '+' => token(self, TokenKind::Plus),
+            '-' => token(self, TokenKind::Minus),
+            '*' => token(self, TokenKind::Asterisk),
+            '/' => token(self, TokenKind::Slash),
+            '%' => token(self, TokenKind::Procent),
+            '^' => token(self, TokenKind::Carrot),
+            '(' => token(self, TokenKind::Lparen),
+            ')' => token(self, TokenKind::Rparen),
+            '{' => token(self, TokenKind::Lbrace),
+            '}' => token(self, TokenKind::Rbrace),
+            ',' => token(self, TokenKind::Comma),
+            '|' => token(self, TokenKind::Bar),
+            'x' | 'X' => token(self, TokenKind::X),
+            'y' | 'Y' => token(self, TokenKind::Y),
             '0'..='9' => {
                 let mut number = String::new();
                 while let Some(c) = self.current() {

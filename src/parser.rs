@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    ast::{BinExpr, BinOp, ColorExpr, Expr, ExprKind, NegExpr, ParenExpr},
+    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, NegExpr, ParenExpr},
     lexer::{Token, TokenKind},
     text::Span,
 };
@@ -111,6 +111,28 @@ impl Parser {
         }
     }
 
+    fn parse_abs_expr(&mut self) -> Expr {
+        let start_span = self.current().unwrap().span.clone();
+
+        self.consume(); // Consume left |
+
+        self.looking_for.push(TokenKind::Bar);
+
+        let inner = self.parse_expr();
+
+        self.looking_for.pop();
+
+        let end = self.consume(); // Consume right parenthesis
+
+        Expr {
+            kind: ExprKind::Abs(AbsExpr::new(inner)),
+            span: Span {
+                end: end.map_or(self.source.len() - 1, |t| t.span.end),
+                start: start_span.start,
+            },
+        }
+    }
+
     fn parse_parenthesized_expr(&mut self) -> Expr {
         let start_span = self.current().unwrap().span.clone();
 
@@ -159,6 +181,7 @@ impl Parser {
             TokenKind::Minus => self.parse_neg_expr(),
             TokenKind::Lparen => self.parse_parenthesized_expr(),
             TokenKind::Lbrace => self.parse_color(),
+            TokenKind::Bar => self.parse_abs_expr(),
             TokenKind::X => {
                 self.consume();
                 expr(ExprKind::X)

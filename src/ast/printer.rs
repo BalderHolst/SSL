@@ -78,6 +78,13 @@ impl Visitor for Printer {
         self.unindent();
     }
 
+    fn visit_abs_expr(&mut self, expr: &super::AbsExpr) {
+        vprintln!(self, "AbsExpr:");
+        self.indent();
+        self.do_visit_abs_expr(expr);
+        self.unindent();
+    }
+
     fn visit_number_expr(&mut self, expr: &super::NumberExpr) {
         vprintln!(self, "NumberExpr: {:?}", expr)
     }

@@ -29,6 +29,7 @@ pub enum ExprKind {
     Color(ColorExpr),
     Paren(ParenExpr),
     Neg(NegExpr),
+    Abs(AbsExpr),
     X,
     Y,
 }
@@ -107,3 +108,17 @@ impl NegExpr {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct AbsExpr {
+    pub inner: Box<Expr>,
+}
+
+impl AbsExpr {
+    pub fn new(inner: Expr) -> Self {
+        Self {
+            inner: Box::new(inner),
+        }
+    }
+}
+
