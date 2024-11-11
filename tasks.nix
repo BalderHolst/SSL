@@ -1,5 +1,8 @@
 { task-lib }:
 with task-lib;
+let 
+    root = task-lib.snips.git-find-root;
+in
 rec { 
 
     build = mkTask "build" { script = /*bash*/ ''
@@ -29,6 +32,12 @@ rec {
                 || { echo "Example AST has changed." && exit 1 ; }
             '';
         depends = [ build ];
+    };
+
+    build-demo = mkTask "build-demo" {
+        script = /*bash*/ ''
+            wasm-pack build "`${root}`/demo"
+        '';
     };
 
     gen-scripts = task-lib.gen.gen-scripts "gen-scripts";

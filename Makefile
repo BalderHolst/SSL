@@ -8,6 +8,7 @@ thelp:
 	@echo ""
 	@echo "Available Tasks:"
 	@echo -e '	build'
+	@echo -e '	build-demo'
 	@echo -e '	check-examples'
 	@echo -e '	gen-scripts'
 	@echo -e '	record-examples'
@@ -20,9 +21,15 @@ build:
 	
 
 
-check-examples: 
+build-demo: 
+	wasm-pack build "`git rev-parse --show-toplevel`/demo"
+	
+
+
+check-examples: build
 	ls ./examples | xargs -I{} bash -c \
-	    "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast | diff - tests/{}.ast"
+	    "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast | diff - tests/{}.ast || exit 1" \
+	    || { echo "Example AST has changed." && exit 1 ; }
 	
 
 
