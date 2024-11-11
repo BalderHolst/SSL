@@ -26,6 +26,9 @@ rec {
                 buildInputs = [
                     cowsay
                     lolcat
+                    wasm-pack
+                    rustc-wasm32
+                    lld
                 ] ++ (task-lib.mkScripts tasks);
 
                 shellHook = ''
