@@ -234,14 +234,15 @@ impl Parser {
             tk => {
                 let n = tk.as_usize();
                 let number = tk.as_f64();
+                let looked_for = self.looking_for.len()+1;
                 let expr = choice! { n + self.seed(),
-                    3 => self.parse_color(),
+                    3/looked_for => self.parse_color(),
+                    1/(looked_for*3) => self.parse_parenthesized_expr(),
                     3 => expr(ExprKind::X),
                     3 => expr(ExprKind::Y),
                     3 => expr(ExprKind::Number(number)),
                     2 => self.parse_if_expr(),
-                    1 => self.parse_neg_expr(),
-                    1 => self.parse_parenthesized_expr(),
+                    0 => self.parse_neg_expr(),
                 };
                 self.consume();
                 expr
