@@ -62,15 +62,21 @@ pub enum BinOp {
     Div,
     Mod,
     Pow,
-    Max,
-    Min,
+    LessThan,
+    GreaterThan,
+    Equal,
+    Or,
+    And,
 }
 
 impl BinOp {
     pub fn precedence(&self) -> u8 {
         match self {
-            Self::Max => 0,
-            Self::Min => 0,
+            Self::LessThan => 0,
+            Self::GreaterThan => 0,
+            Self::Equal => 0,
+            Self::Or => 0,
+            Self::And => 0,
             Self::Add => 1,
             Self::Sub => 1,
             Self::Mul => 2,

@@ -1,4 +1,7 @@
-use std::{cmp::Ordering, ops::{Add, Div, Mul, Sub}};
+use std::{
+    cmp::Ordering,
+    ops::{Add, Div, Mul, Sub},
+};
 
 use crate::ast::{BinOp, Expr, ExprKind};
 
@@ -109,9 +112,8 @@ macro_rules! bool {
     };
 }
 
-
 macro_rules! impl_trait_op {
-    ($trait:ident, $method:ident, $struct:ident) => {
+    ($struct:ident, $trait:ident, $method:ident) => {
         impl $trait for $struct {
             type Output = Self;
             fn $method(self, other: Self) -> Self::Output {
@@ -129,12 +131,12 @@ macro_rules! impl_trait_op {
                     (Result::Color(c), Result::Bool(b)) => {
                         let b = bool_to_f64(b);
                         color!(c.r.$method(b), c.g.$method(b), c.b.$method(b))
-                    },
+                    }
                     (Result::Number(n), Result::Bool(b)) => number!(n.$method(bool_to_f64(b))),
                     (Result::Bool(b), Result::Color(c)) => {
                         let b = bool_to_f64(b);
                         color!(b.$method(c.r), b.$method(c.g), b.$method(c.b))
-                    },
+                    }
                     (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(b).$method(n)),
                     (Result::Bool(b1), Result::Bool(b2)) => {
                         number!(bool_to_f64(b1).$method(bool_to_f64(b2)))
@@ -144,38 +146,102 @@ macro_rules! impl_trait_op {
         }
     };
 }
-impl_trait_op!(Add, add, Result);
-impl_trait_op!(Sub, sub, Result);
-impl_trait_op!(Mul, mul, Result);
-impl_trait_op!(Div, div, Result);
+impl_trait_op!(Result, Add, add);
+impl_trait_op!(Result, Sub, sub);
+impl_trait_op!(Result, Mul, mul);
+impl_trait_op!(Result, Div, div);
 
-impl Result {
-    fn fmod(&self, other: Self) -> Self {
-        match (self, other) {
-            (Result::Color(c1), Result::Color(c2)) => {
-                color!(c1.r % c2.r, c1.g % c2.g, c1.b % c2.b)
+macro_rules! impl_float_op {
+    ($struct:ident, $name:ident, $sym:tt) => {
+        impl $struct {
+            fn $name(self, other: Self) -> Self {
+                match (self, other) {
+                    (Result::Color(c1), Result::Color(c2)) => {
+                        color!(c1.r $sym c2.r, c1.g $sym c2.g, c1.b $sym c2.b)
+                    }
+                    (Result::Color(c), Result::Number(n)) => {
+                        color!(c.r $sym n, c.g $sym n, c.b $sym n)
+                    }
+                    (Result::Number(n), Result::Color(c)) => {
+                        color!(n $sym c.r, n $sym c.g, n $sym c.b)
+                    }
+                    (Result::Number(n1), Result::Number(n2)) => number!(n1 $sym n2),
+                    (Result::Color(c), Result::Bool(b)) => {
+                        let b = bool_to_f64(b);
+                        color!(c.r $sym b, c.g $sym b, c.b $sym b)
+                    },
+                    (Result::Number(n), Result::Bool(b)) => number!(n $sym bool_to_f64(b)),
+                    (Result::Bool(b), Result::Color(c)) => {
+                        let b = bool_to_f64(b);
+                        color!(b $sym c.r, b $sym c.g, b $sym c.b)
+                    },
+                    (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(b) $sym n),
+                    (Result::Bool(b1), Result::Bool(b2)) => {
+                        let n = number!(bool_to_f64(b1) $sym bool_to_f64(b2));
+                        bool!(n.as_bool())
+                    }
+                }
             }
-            (Result::Color(c), Result::Number(n)) => {
-                color!(c.r % n, c.g % n, c.b % n)
-            }
-            (Result::Number(n), Result::Color(c)) => {
-                color!(n % c.r, n % c.g, n % c.b)
-            }
-            (Result::Number(n1), Result::Number(n2)) => number!(n1 % n2),
-            (Result::Color(c), Result::Bool(b)) => {
-                let b = bool_to_f64(b);
-                color!(c.r % b, c.g % b, c.b % b)
-            },
-            (Result::Number(n), Result::Bool(b)) => number!(n % bool_to_f64(b)),
-            (Result::Bool(b), Result::Color(c)) => {
-                let b = bool_to_f64(*b);
-                color!(b % c.r, b % c.g, b % c.b)
-            },
-            (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(*b) % n),
-            (Result::Bool(b1), Result::Bool(b2)) => bool!(b1 ^ b2),
         }
     }
+}
+impl_float_op!(Result, fmod, %);
 
+macro_rules! impl_bin_op {
+    ($struct:ident, $name:ident, $sym:tt) => {
+        impl $struct {
+            fn $name(self, other: Self) -> Self {
+                match (self, other) {
+                    (Result::Color(c1), Result::Color(c2)) => {
+                        let r = bool_to_f64(c1.r $sym c2.r);
+                        let g = bool_to_f64(c1.g $sym c2.g);
+                        let b = bool_to_f64(c1.b $sym c2.b);
+                        color!(r, g, b)
+                    }
+                    (Result::Color(c), Result::Number(n)) => {
+                        let r = bool_to_f64(c.r $sym n);
+                        let g = bool_to_f64(c.g $sym n);
+                        let b = bool_to_f64(c.b $sym n);
+                        color!(r, g, b)
+                    }
+                    (Result::Number(n), Result::Color(c)) => {
+                        let r = bool_to_f64(n $sym c.r);
+                        let g = bool_to_f64(n $sym c.g);
+                        let b = bool_to_f64(n $sym c.b);
+                        color!(r, g, b)
+                    }
+                    (Result::Number(n1), Result::Number(n2)) => bool!(n1 $sym n2),
+                    (Result::Color(c), Result::Bool(b)) => {
+                        let b = bool_to_f64(b);
+                        let r = bool_to_f64(c.r $sym b);
+                        let g = bool_to_f64(c.g $sym b);
+                        let b = bool_to_f64(c.b $sym b);
+                        color!(r, g, b)
+                    },
+                    (Result::Number(n), Result::Bool(b)) => bool!(n $sym bool_to_f64(b)),
+                    (Result::Bool(b), Result::Color(c)) => {
+                        let b = bool_to_f64(b);
+                        let r = bool_to_f64(b $sym c.r);
+                        let g = bool_to_f64(b $sym c.g);
+                        let b = bool_to_f64(b $sym c.b);
+                        color!(r, g, b)
+                    },
+                    (Result::Bool(b), Result::Number(n)) => bool!(bool_to_f64(b) $sym n),
+                    (Result::Bool(b1), Result::Bool(b2)) => {
+                        let b1 = bool_to_f64(b1);
+                        let b2 = bool_to_f64(b2);
+                        bool!(b1 $sym b2)
+                    }
+                }
+            }
+        }
+    }
+}
+impl_bin_op!(Result, less, <);
+impl_bin_op!(Result, greater, >);
+impl_bin_op!(Result, equal, ==);
+
+impl Result {
     fn pow(&self, other: Self) -> Self {
         match (self, other) {
             (Result::Color(c1), Result::Color(c2)) => {
@@ -191,12 +257,12 @@ impl Result {
             (Result::Color(c), Result::Bool(b)) => {
                 let b = bool_to_f64(b);
                 color!(c.r.powf(b), c.g.powf(b), c.b.powf(b))
-            },
+            }
             (Result::Number(n), Result::Bool(b)) => number!(n.powf(bool_to_f64(b))),
             (Result::Bool(b), Result::Color(c)) => {
                 let b = bool_to_f64(*b);
                 color!(b.powf(c.r), b.powf(c.g), b.powf(c.b))
-            },
+            }
             (Result::Bool(b), Result::Number(n)) => number!(bool_to_f64(*b).powf(n)),
             (Result::Bool(b1), Result::Bool(b2)) => bool!(b1 ^ b2),
         }
@@ -212,15 +278,25 @@ impl Result {
         }
     }
 
-    fn max(&self, other: &Self) -> Self {
-        match self.partial_cmp(other) {
+    fn or(self, other: Self) -> Self {
+
+        if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
+            return bool!(*b1 || *b2);
+        }
+
+        match self.partial_cmp(&other) {
             Some(Ordering::Less) => other.clone(),
             _ => self.clone(),
         }
     }
 
-    fn min(&self, other: &Self) -> Self {
-        match self.partial_cmp(other) {
+    fn and(self, other: Self) -> Self {
+
+        if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
+            return bool!(*b1 && *b2);
+        }
+
+        match self.partial_cmp(&other) {
             Some(Ordering::Greater) => other.clone(),
             _ => self.clone(),
         }
@@ -239,8 +315,11 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
                 BinOp::Div => l / r,
                 BinOp::Mod => l.fmod(r),
                 BinOp::Pow => l.pow(r),
-                BinOp::Max => l.max(&r),
-                BinOp::Min => l.min(&r),
+                BinOp::Or => l.or(r),
+                BinOp::And => l.and(r),
+                BinOp::LessThan => l.less(r),
+                BinOp::GreaterThan => l.greater(r),
+                BinOp::Equal => l.equal(r),
             }
         }
         ExprKind::Color(c) => {
