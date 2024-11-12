@@ -16,6 +16,8 @@ pub struct Expr {
 }
 
 impl Expr {
+
+    #[allow(dead_code)]
     pub fn print(&self, source: Rc<String>) {
         let mut printer = printer::Printer::new(source);
         printer.visit_expr(self);

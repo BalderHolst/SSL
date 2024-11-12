@@ -1,6 +1,6 @@
 use clap::Parser;
 use image_gen::generate_image;
-use std::{fs, process::exit, rc::Rc};
+use std::{fs, process::exit};
 
 mod cli;
 mod lexer;

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Span {
     pub start: usize,

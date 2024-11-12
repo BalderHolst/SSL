@@ -5,7 +5,7 @@ mod lexer;
 mod parser;
 mod text;
 
-pub fn generate(source: String, width: u32, height: u32) -> image::RgbaImage {
+pub fn generate(source: String, width: u32, height: u32) -> image::RgbImage {
     let lexer = lexer::Lexer::new(source);
     let source = lexer.source();
     let tokens: Vec<_> = lexer.collect();
