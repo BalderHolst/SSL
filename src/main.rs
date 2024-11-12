@@ -37,6 +37,9 @@ fn main() {
     let image = generate_image(expr, opts.width, opts.height);
 
     let out_file = &opts.output;
-    image.save(out_file).unwrap();
+    image.save(out_file).map_err(|e| {
+        eprintln!("Error saving image to '{}': {}", out_file, e);
+        exit(1);
+    }).unwrap();
     println!("Wrote image to '{out_file}'.");
 }

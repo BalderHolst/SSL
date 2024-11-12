@@ -18,7 +18,8 @@ rec {
 
             apps = {
                 gen-scripts = with task-lib; mkGenScriptsApp {
-                    "Makefile" = mkMakefile tasks;
+                    "scripts/build.sh" = mkScript tasks.build;
+                    "scripts/package.sh" = mkScript tasks.demo-package;
                 };
             };
 
