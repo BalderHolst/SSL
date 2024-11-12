@@ -1,7 +1,6 @@
 use super::Expr;
 
 pub trait Visitor {
-
     fn visit_expr(&mut self, expr: &Expr) {
         self.do_visit_expr(expr);
     }
@@ -61,5 +60,4 @@ pub trait Visitor {
     fn visit_color_expr(&mut self, expr: &super::ColorExpr);
     fn visit_x_expr(&mut self);
     fn visit_y_expr(&mut self);
-
 }

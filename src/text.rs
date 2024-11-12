@@ -18,6 +18,4 @@ impl Span {
     pub fn slice<'a>(&self, source: &'a String) -> &'a str {
         &source[self.start..self.end]
     }
-
 }
-

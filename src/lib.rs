@@ -1,6 +1,6 @@
-mod image_gen;
 mod ast;
 mod evaluator;
+mod image_gen;
 mod lexer;
 mod parser;
 mod text;

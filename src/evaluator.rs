@@ -279,7 +279,6 @@ impl Result {
     }
 
     fn or(self, other: Self) -> Self {
-
         if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
             return bool!(*b1 || *b2);
         }
@@ -291,7 +290,6 @@ impl Result {
     }
 
     fn and(self, other: Self) -> Self {
-
         if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
             return bool!(*b1 && *b2);
         }

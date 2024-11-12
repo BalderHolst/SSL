@@ -4,8 +4,8 @@ use visitor::Visitor;
 
 use crate::text::Span;
 
-mod visitor;
 mod printer;
+mod visitor;
 
 pub type NumberExpr = f64;
 
@@ -16,7 +16,6 @@ pub struct Expr {
 }
 
 impl Expr {
-
     #[allow(dead_code)]
     pub fn print(&self, source: Rc<String>) {
         let mut printer = printer::Printer::new(source);
@@ -53,7 +52,6 @@ impl ColorExpr {
         }
     }
 }
-
 
 #[derive(Debug)]
 #[repr(u8)]
@@ -161,4 +159,3 @@ impl AbsExpr {
         }
     }
 }
-

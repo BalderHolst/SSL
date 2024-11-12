@@ -30,7 +30,6 @@ impl Printer {
     }
 }
 
-
 macro_rules! vprintln {
     ($self:ident, $($arg:tt)*) => {
         $self.print(&format!($($arg)*))

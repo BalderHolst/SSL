@@ -48,30 +48,30 @@ pub enum TokenKind {
 impl TokenKind {
     pub fn as_usize(&self) -> usize {
         match self {
-            TokenKind::X           => 0,
-            TokenKind::Y           => 1,
-            TokenKind::Plus        => 2,
-            TokenKind::Minus       => 3,
-            TokenKind::Asterisk    => 4,
-            TokenKind::Slash       => 5,
-            TokenKind::Procent     => 6,
-            TokenKind::Less        => 7,
-            TokenKind::Greater     => 8,
-            TokenKind::Equal       => 9,
+            TokenKind::X => 0,
+            TokenKind::Y => 1,
+            TokenKind::Plus => 2,
+            TokenKind::Minus => 3,
+            TokenKind::Asterisk => 4,
+            TokenKind::Slash => 5,
+            TokenKind::Procent => 6,
+            TokenKind::Less => 7,
+            TokenKind::Greater => 8,
+            TokenKind::Equal => 9,
             TokenKind::Exclamation => 10,
-            TokenKind::Carrot      => 11,
-            TokenKind::Lparen      => 12,
-            TokenKind::Rparen      => 13,
-            TokenKind::Lbrace      => 14,
-            TokenKind::Rbrace      => 15,
-            TokenKind::Bar         => 16,
-            TokenKind::And         => 17,
-            TokenKind::Comma       => 18,
-            TokenKind::Whitespace  => 19,
-            TokenKind::If          => 20,
-            TokenKind::Then        => 21,
-            TokenKind::Else        => 22,
-            TokenKind::End         => 23,
+            TokenKind::Carrot => 11,
+            TokenKind::Lparen => 12,
+            TokenKind::Rparen => 13,
+            TokenKind::Lbrace => 14,
+            TokenKind::Rbrace => 15,
+            TokenKind::Bar => 16,
+            TokenKind::And => 17,
+            TokenKind::Comma => 18,
+            TokenKind::Whitespace => 19,
+            TokenKind::If => 20,
+            TokenKind::Then => 21,
+            TokenKind::Else => 22,
+            TokenKind::End => 23,
             TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
             TokenKind::Other(c) => (*c) as usize,
         }
@@ -193,7 +193,7 @@ impl Iterator for Lexer {
                 };
                 self.cursor += size;
                 token
-            },
+            }
         }
     }
 }

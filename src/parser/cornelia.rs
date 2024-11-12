@@ -1,15 +1,17 @@
-use crate::{ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, ParenExpr}, text::Span};
-
+use crate::{
+    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, ParenExpr},
+    text::Span,
+};
 
 pub fn cornelia_expr(span: Span) -> Expr {
-        let expr = |kind: ExprKind| Expr {
-            kind,
-            span: span.clone(),
-        };
+    let expr = |kind: ExprKind| Expr {
+        kind,
+        span: span.clone(),
+    };
 
+    expr(ExprKind::Bin(BinExpr::new(
+        BinOp::Mul,
         expr(ExprKind::Bin(BinExpr::new(
-            BinOp::Mul,
-            expr(ExprKind::Bin(BinExpr::new(
             BinOp::Or,
             expr(ExprKind::Bin(BinExpr::new(
                 BinOp::Mul,
@@ -90,10 +92,10 @@ pub fn cornelia_expr(span: Span) -> Expr {
                 expr(ExprKind::Number(-1.0)),
             ))),
         ))),
-            expr(ExprKind::Color(ColorExpr::new(
-                expr(ExprKind::Number(10000.0)),
-                expr(ExprKind::Number(0.0)),
-                expr(ExprKind::Number(0.0)),
-            ))),
-        )))
+        expr(ExprKind::Color(ColorExpr::new(
+            expr(ExprKind::Number(10000.0)),
+            expr(ExprKind::Number(0.0)),
+            expr(ExprKind::Number(0.0)),
+        ))),
+    )))
 }
