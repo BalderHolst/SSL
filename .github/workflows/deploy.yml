@@ -27,6 +27,11 @@ jobs:
       - name: Build and Package
         run: ./scripts/package.sh
 
+      - name: Upload Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./demo/public
+
   # Deploy job
   deploy:
 
