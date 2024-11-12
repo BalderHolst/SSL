@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use ssl;
 
 
 const WIDTH: usize = 800;
@@ -32,15 +33,17 @@ pub fn get_index(x: usize, y: usize) -> usize {
 }
 
 #[wasm_bindgen]
-pub fn render() {
-    for x in 0..WIDTH {
-        for y in 0..HEIGHT {
+pub fn render(code: String) {
+    let image = ssl::generate(code, WIDTH as u32, HEIGHT as u32);
+    for y in 0..HEIGHT {
+        for x in 0..WIDTH {
             let index = get_index(x, y);
+            let pixel = image.get_pixel(x as u32, y as u32);
             unsafe {
-                STATIC[index+0] = 255;
-                STATIC[index+1] = 100;
-                STATIC[index+2] = 0;
-                STATIC[index+3] = 255;
+                STATIC[index] = pixel[0];
+                STATIC[index + 1] = pixel[1];
+                STATIC[index + 2] = pixel[2];
+                STATIC[index + 3] = pixel[3];
             }
         }
     }

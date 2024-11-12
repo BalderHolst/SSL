@@ -34,6 +34,9 @@ fn main() {
         exit(0);
     }
 
-    generate_image(expr, opts.width, opts.height, &opts.output);
+    let image = generate_image(expr, opts.width, opts.height);
 
+    let out_file = &opts.output;
+    image.save(out_file).unwrap();
+    println!("Wrote image to '{out_file}'.");
 }

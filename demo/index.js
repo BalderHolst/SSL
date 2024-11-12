@@ -2,7 +2,7 @@ import init, { render, get_buffer_ptr, get_buffer_size, canvas_width, canvas_hei
 
 
 init().then((wasm) => {
-    render();
+    render("(0.5 - (x*x+y*y)*(x*x+y*y)*5) + {0.5, x-0.5, y+0.5}");
 
     const ptr = get_buffer_ptr();
     const size = get_buffer_size();

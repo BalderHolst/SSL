@@ -1,10 +1,10 @@
-use image::{self, Rgb, RgbImage};
+use image::{self, Rgb, RgbImage, Rgba, RgbaImage};
 
 use crate::{ast::Expr, evaluator::eval};
 
 
-pub fn generate_image(expr: Expr, width: u32, height: u32, out_file: &str) {
-    let mut image = RgbImage::new(width, height);
+pub fn generate_image(expr: Expr, width: u32, height: u32) -> RgbaImage {
+    let mut image = RgbaImage::new(width, height);
 
     for x in 0..width {
         for y in 0..height {
@@ -18,10 +18,8 @@ pub fn generate_image(expr: Expr, width: u32, height: u32, out_file: &str) {
             let g = (c.g * (u8::MAX as f64)) as u8;
             let b = (c.b * (u8::MAX as f64)) as u8;
 
-            image.put_pixel(x, y, Rgb([r, g, b]))
+            image.put_pixel(x, y, Rgba([r, g, b, u8::MAX]));
         }
     }
-
-    image.save(out_file).unwrap();
-    println!("Wrote image to '{out_file}'.");
+    image
 }
