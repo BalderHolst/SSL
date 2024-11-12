@@ -10,6 +10,8 @@ pub fn cornelia_expr(span: Span) -> Expr {
     };
 
     expr(ExprKind::Bin(BinExpr::new(
+        BinOp::Sub,
+        expr(ExprKind::Bin(BinExpr::new(
         BinOp::Mul,
         expr(ExprKind::Bin(BinExpr::new(
             BinOp::Or,
@@ -97,5 +99,12 @@ pub fn cornelia_expr(span: Span) -> Expr {
             expr(ExprKind::Number(0.0)),
             expr(ExprKind::Number(0.0)),
         ))),
+    ))),
+        expr(ExprKind::Color(ColorExpr::new(
+            expr(ExprKind::Number(0.0)),
+            expr(ExprKind::Number(1.0)),
+            expr(ExprKind::Number(1.0)),
+        ))),
     )))
+
 }
