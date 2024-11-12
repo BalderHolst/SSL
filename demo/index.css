@@ -1,0 +1,52 @@
+
+body {
+    background-color: #111;
+    color: #CFC;
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+}
+
+.wrapper {
+    /* Center children horizontally */
+    width: 55%;
+    display: grid;
+    grid-auto-flow: row;
+    gap: 10px;
+}
+
+.buttons {
+    width: 100%;
+    display: inline;
+}
+
+#canvas {
+    width: min(100%, 600px);
+    object-fit: contain;
+    background-color: #000;
+    border: 1px solid #333;
+}
+
+#code {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    background-color: #222;
+    /*remove border*/
+    color: #BDB;
+    min-height: 100px;
+    font-family: monospace;
+    font-size: 2em;
+    resize: vertical;
+    outline: 0;
+    border: 1px solid #CCC;
+}
+
+#code:focus {
+    border: 2px solid #CFC;
+    outline: green;
+}
