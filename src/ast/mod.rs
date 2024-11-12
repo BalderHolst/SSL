@@ -96,6 +96,16 @@ pub struct BinExpr {
     pub rhs: Box<Expr>,
 }
 
+impl BinExpr {
+    pub fn new(op: BinOp, lhs: Expr, rhs: Expr) -> Self {
+        Self {
+            op,
+            lhs: Box::new(lhs),
+            rhs: Box::new(rhs),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct IfExpr {
     pub cond: Box<Expr>,

@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+mod cornelia;
+
 use crate::{
     ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr},
     lexer::{Token, TokenKind},
@@ -190,6 +192,21 @@ impl Parser {
         }
     }
 
+    fn parse_cornelia(&mut self) -> Expr {
+        let start_span = self.current().unwrap().span.clone();
+
+        let len = "Cornelia".len();
+
+        self.cursor += len;
+
+        let span = Span {
+            start: start_span.start,
+            end: start_span.start + len,
+        };
+
+        cornelia::cornelia_expr(span)
+    }
+
     fn is_done(&self) -> bool {
         self.cursor >= self.tokens.len()
     }
@@ -230,11 +247,32 @@ impl Parser {
                 let n = n.clone();
                 self.consume();
                 expr(ExprKind::Number(n))
-            },
+            }
+            TokenKind::Other('C') | TokenKind::Other('c')
+                if (
+                    self.peak(1).map(|t| &t.kind),
+                    self.peak(2).map(|t| &t.kind),
+                    self.peak(3).map(|t| &t.kind),
+                    self.peak(4).map(|t| &t.kind),
+                    self.peak(5).map(|t| &t.kind),
+                    self.peak(6).map(|t| &t.kind),
+                    self.peak(7).map(|t| &t.kind),
+                ) == (
+                    Some(&TokenKind::Other('o')),
+                    Some(&TokenKind::Other('r')),
+                    Some(&TokenKind::Other('n')),
+                    Some(&TokenKind::Other('e')),
+                    Some(&TokenKind::Other('l')),
+                    Some(&TokenKind::Other('i')),
+                    Some(&TokenKind::Other('a')),
+                ) =>
+            {
+                self.parse_cornelia()
+            }
             tk => {
                 let n = tk.as_usize();
                 let number = tk.as_f64();
-                let looked_for = self.looking_for.len()+1;
+                let looked_for = self.looking_for.len() + 1;
                 choice! { n + self.seed(),
                     3/looked_for => self.parse_color(),
                     1/(looked_for*3) => self.parse_parenthesized_expr(),
@@ -286,13 +324,12 @@ impl Parser {
         let seed = self.seed();
         if let Some(interest) = self.looking_for.last() {
             if let Some(token) = self.current() {
-
                 if &token.kind == interest {
                     return true;
                 }
 
                 if matches!(&token.kind, TokenKind::Other(_)) {
-                    return choice!{ token.kind.as_usize() + seed,
+                    return choice! { token.kind.as_usize() + seed,
                         1 => true,
                         3 => false,
                     };
@@ -305,7 +342,6 @@ impl Parser {
     /// Parse a binary expression.
     /// https://en.wikipedia.org/wiki/Operator-precedence_parser
     fn parse_binary_expr(&mut self, left: Option<Expr>, min_precedence: u8) -> Expr {
-
         let mut left = match left {
             Some(e) => e,
             None => self.parse_primary_expr(),
@@ -318,7 +354,6 @@ impl Parser {
         let start_span = left.span.clone();
 
         while !self.is_done() {
-
             if self.is_at_interest() {
                 return left;
             }
@@ -355,7 +390,6 @@ impl Parser {
                 if self.is_at_interest() {
                     break;
                 }
-
             }
 
             let span = Span::from_spans(&start_span, &right.span);
