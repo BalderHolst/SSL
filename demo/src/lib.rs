@@ -43,7 +43,7 @@ pub fn render(code: String) {
                 STATIC[index] = pixel[0];
                 STATIC[index + 1] = pixel[1];
                 STATIC[index + 2] = pixel[2];
-                STATIC[index + 3] = pixel[3];
+                STATIC[index + 3] = u8::MAX;
             }
         }
     }
