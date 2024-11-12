@@ -34,10 +34,29 @@ rec {
         depends = [ build ];
     };
 
-    build-demo = mkTask "build-demo" {
+    demo-build = mkTask "demo-build" {
         script = /*bash*/ ''
-            wasm-pack build "`${root}`/demo"
+            wasm-pack build --target web "`${root}`/demo"
         '';
+    };
+
+    demo-serve = mkTask "demo-serve" {
+        script = /*bash*/ ''
+            cd "`${root}`/demo" && python3 -m http.server
+        '';
+        depends = [ demo-build ];
+    };
+
+    demo-watch = mkTask "demo-watch" {
+        script = /*bash*/ ''
+            root="`${root}`"
+            inotifywait -r -m --exclude "(pkg)|(target)" -e modify "$root/demo" | 
+                while read file_path file_event file_name; do 
+                    echo -e "\nFile changed: $file_path/$file_name"
+                    wasm-pack build --target web "$root/demo"
+                done
+        '';
+        depends = [ demo-build ];
     };
 
     gen-scripts = task-lib.gen.gen-scripts "gen-scripts";

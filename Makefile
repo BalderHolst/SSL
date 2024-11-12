@@ -22,7 +22,7 @@ build:
 
 
 build-demo: 
-	wasm-pack build "`git rev-parse --show-toplevel`/demo"
+	wasm-pack build --target web "`git rev-parse --show-toplevel`/demo"
 	
 
 

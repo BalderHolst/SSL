@@ -24,11 +24,11 @@ rec {
 
             devShell = with pkgs; mkShell {
                 buildInputs = [
-                    cowsay
-                    lolcat
-                    wasm-pack
-                    rustc-wasm32
-                    lld
+                    wasm-pack     # Rust wasm packager
+                    rustc-wasm32  # Rust wasm target
+                    lld           # Wasm linker
+                    python3       # For web development server
+                    inotify-tools # For live reloading
                 ] ++ (task-lib.mkScripts tasks);
 
                 shellHook = ''
