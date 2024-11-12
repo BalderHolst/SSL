@@ -1,0 +1,171 @@
+Expr "(
+    ( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 ) * 1.0
+    |
+    if (y+0.133) > 0 then |x|+|(y+0.133)*0.6| < 0.5 else 0-1 end
+) * {10000000000000000, 0, 0}":
+  BinExpr:
+    operation: Mul
+    left:
+      Expr "(
+    ( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 ) * 1.0
+    |
+    if (y+0.133) > 0 then |x|+|(y+0.133)*0.6| < 0.5 else 0-1 end
+)":
+        ParenExpr:
+          Expr "( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 ) * 1.0
+    |
+    if (y+0.133) > 0 then |x|+|(y+0.133)*0.6| < 0.5 else 0-1 e":
+            BinExpr:
+              operation: Or
+              left:
+                Expr "( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 ) * 1.0":
+                  BinExpr:
+                    operation: Mul
+                    left:
+                      Expr "( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 )":
+                        ParenExpr:
+                          Expr "| (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3":
+                            BinExpr:
+                              operation: LessThan
+                              left:
+                                Expr "| (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 |":
+                                  AbsExpr:
+                                    Expr "(( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5":
+                                      BinExpr:
+                                        operation: Pow
+                                        left:
+                                          Expr "(( |x| -0.25 )^2 + ( y+0.3 )^2)":
+                                            ParenExpr:
+                                              Expr "( |x| -0.25 )^2 + ( y+0.3 )^2":
+                                                BinExpr:
+                                                  operation: Add
+                                                  left:
+                                                    Expr "( |x| -0.25 )^2":
+                                                      BinExpr:
+                                                        operation: Pow
+                                                        left:
+                                                          Expr "( |x| -0.25 )":
+                                                            ParenExpr:
+                                                              Expr "|x| -0.25":
+                                                                BinExpr:
+                                                                  operation: Sub
+                                                                  left:
+                                                                    Expr "|x|":
+                                                                      AbsExpr:
+                                                                        Expr "x":
+                                                                          X
+                                                                  right:
+                                                                    Expr "0.25":
+                                                                      NumberExpr: 0.25
+                                                        right:
+                                                          Expr "2":
+                                                            NumberExpr: 2.0
+                                                  right:
+                                                    Expr "( y+0.3 )^2":
+                                                      BinExpr:
+                                                        operation: Pow
+                                                        left:
+                                                          Expr "( y+0.3 )":
+                                                            ParenExpr:
+                                                              Expr "y+0.3":
+                                                                BinExpr:
+                                                                  operation: Add
+                                                                  left:
+                                                                    Expr "y":
+                                                                      Y
+                                                                  right:
+                                                                    Expr "0.3":
+                                                                      NumberExpr: 0.3
+                                                        right:
+                                                          Expr "2":
+                                                            NumberExpr: 2.0
+                                        right:
+                                          Expr "0.5":
+                                            NumberExpr: 0.5
+                              right:
+                                Expr "0.3":
+                                  NumberExpr: 0.3
+                    right:
+                      Expr "1.0":
+                        NumberExpr: 1.0
+              right:
+                Expr "if (y+0.133) > 0 then |x|+|(y+0.133)*0.6| < 0.5 else 0-1 e":
+                  IfExpr:
+                    Condition:
+                      Expr "(y+0.133) > 0":
+                        BinExpr:
+                          operation: GreaterThan
+                          left:
+                            Expr "(y+0.133)":
+                              ParenExpr:
+                                Expr "y+0.133":
+                                  BinExpr:
+                                    operation: Add
+                                    left:
+                                      Expr "y":
+                                        Y
+                                    right:
+                                      Expr "0.133":
+                                        NumberExpr: 0.133
+                          right:
+                            Expr "0":
+                              NumberExpr: 0.0
+                    True:
+                      Expr "|x|+|(y+0.133)*0.6| < 0.5":
+                        BinExpr:
+                          operation: LessThan
+                          left:
+                            Expr "|x|+|(y+0.133)*0.6|":
+                              BinExpr:
+                                operation: Add
+                                left:
+                                  Expr "|x|":
+                                    AbsExpr:
+                                      Expr "x":
+                                        X
+                                right:
+                                  Expr "|(y+0.133)*0.6|":
+                                    AbsExpr:
+                                      Expr "(y+0.133)*0.6":
+                                        BinExpr:
+                                          operation: Mul
+                                          left:
+                                            Expr "(y+0.133)":
+                                              ParenExpr:
+                                                Expr "y+0.133":
+                                                  BinExpr:
+                                                    operation: Add
+                                                    left:
+                                                      Expr "y":
+                                                        Y
+                                                    right:
+                                                      Expr "0.133":
+                                                        NumberExpr: 0.133
+                                          right:
+                                            Expr "0.6":
+                                              NumberExpr: 0.6
+                          right:
+                            Expr "0.5":
+                              NumberExpr: 0.5
+                    False:
+                      Expr "0-1":
+                        BinExpr:
+                          operation: Sub
+                          left:
+                            Expr "0":
+                              NumberExpr: 0.0
+                          right:
+                            Expr "1":
+                              NumberExpr: 1.0
+    right:
+      Expr "{10000000000000000, 0, 0}":
+        ColorExpr:
+          R:
+            Expr "10000000000000000":
+              NumberExpr: 1e16
+          G:
+            Expr "0":
+              NumberExpr: 0.0
+          B:
+            Expr "0":
+              NumberExpr: 0.0
