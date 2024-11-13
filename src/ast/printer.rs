@@ -3,14 +3,14 @@ use std::rc::Rc;
 use super::{visitor::Visitor, Expr};
 
 pub struct Printer {
-    source: Rc<String>,
+    source: Rc<Vec<u8>>,
     level: usize,
 }
 
 impl Printer {
     const INDENTATION: usize = 2;
 
-    pub fn new(source: Rc<String>) -> Self {
+    pub fn new(source: Rc<Vec<u8>>) -> Self {
         Self { source, level: 0 }
     }
 

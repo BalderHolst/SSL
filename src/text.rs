@@ -15,7 +15,10 @@ impl Span {
         Self::new(start, end)
     }
 
-    pub fn slice<'a>(&self, source: &'a str) -> &'a str {
-        &source[self.start..self.end]
+    pub fn slice(&self, source: &[u8]) -> String {
+        source[self.start..self.end]
+            .iter()
+            .map(|&b| if b.is_ascii() { b as char } else { '�' })
+            .collect()
     }
 }

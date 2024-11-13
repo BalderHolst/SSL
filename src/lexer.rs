@@ -86,32 +86,31 @@ impl TokenKind {
 }
 
 pub struct Lexer {
-    source: Rc<String>,
-    chars: Vec<char>,
+    source: Rc<Vec<u8>>,
     cursor: usize,
 }
 
 impl Lexer {
     pub fn new(source: String) -> Self {
         Self {
-            chars: source.chars().collect(),
-            source: Rc::new(source),
+            source: Rc::new(source.into_bytes()),
             cursor: 0,
         }
     }
 
-    pub fn source(&self) -> Rc<String> {
+    pub fn source(&self) -> Rc<Vec<u8>> {
         Rc::clone(&self.source)
     }
 
     fn current(&self) -> Option<char> {
-        self.chars.get(self.cursor).copied()
+        self.source.get(self.cursor).copied().map(Into::into)
     }
 
     fn peak(&self, offset: isize) -> Option<char> {
-        self.chars
+        self.source
             .get((self.cursor as isize + offset) as usize)
             .copied()
+            .map(Into::into)
     }
 
     fn span(&self, start: usize) -> Span {

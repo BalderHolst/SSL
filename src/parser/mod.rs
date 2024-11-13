@@ -9,7 +9,7 @@ use crate::{
 };
 
 pub struct Parser {
-    source: Rc<String>,
+    source: Rc<Vec<u8>>,
     tokens: Vec<Token>,
     cursor: usize,
     looking_for: Vec<TokenKind>,
@@ -40,12 +40,12 @@ pub fn parse_source(source: String) -> ast::Expr {
     let lexer = lexer::Lexer::new(source);
     let source = lexer.source();
     let tokens: Vec<_> = lexer.collect();
-    let mut parser = Parser::new(tokens, source.clone());
+    let mut parser = Parser::new(tokens, source);
     parser.parse_expr()
 }
 
 impl Parser {
-    pub fn new(tokens: Vec<Token>, source: Rc<String>) -> Self {
+    pub fn new(tokens: Vec<Token>, source: Rc<Vec<u8>>) -> Self {
         Self {
             tokens,
             source,
