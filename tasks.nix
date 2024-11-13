@@ -67,7 +67,7 @@ rec {
         '';
     };
 
-    demo-build-release = mkTask "demo-build" {
+    demo-build-release = mkTask "demo-build-release" {
         script = /*bash*/ ''
             wasm-pack build --release --target web "`${root}`/demo"
         '';
