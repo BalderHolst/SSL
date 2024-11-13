@@ -7,5 +7,5 @@ echo "->> Running 'build'"
 # Dependencies for build
 
 # Run build task
-cargo build --release
+cargo build --release --manifest-path "`git rev-parse --show-toplevel`/././Cargo.toml"
 

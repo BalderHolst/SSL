@@ -244,7 +244,7 @@ impl Parser {
                 expr(ExprKind::Y)
             }
             TokenKind::Number(n) => {
-                let n = n.clone();
+                let n = *n;
                 self.consume();
                 expr(ExprKind::Number(n))
             }

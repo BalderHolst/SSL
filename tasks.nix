@@ -1,13 +1,40 @@
 { task-lib }:
 with task-lib;
 let 
-    root = task-lib.snips.git-find-root;
+    root = snips.git-find-root;
+
+    manifest-path = x: ''--manifest-path "`${root}`/${x}/Cargo.toml"'';
+
+    cargo-fmt = x: /*bash*/ ''
+        cargo fmt --check ${manifest-path x} \
+            || { echo -e "\nPlease format your files in '${x}'.";  exit 1; }
+    '';
+
+    cargo-clippy = x: /*bash*/ ''
+        cargo clippy ${manifest-path x} -- --deny warnings 2> /dev/null \
+            || { echo -e "\nClippy is angry in '${x}'."; exit 1; }
+    '';
+
+    cargo-build = dir: /*bash*/ ''
+        cargo build --release ${manifest-path dir}
+    '';
+
 in
 rec { 
 
-    build = mkTask "build" { script = /*bash*/ ''
-        cargo build --release
-    ''; };
+    build = mkTask "build" { script = cargo-build "./."; };
+
+    check-fmt = mkTask "check-fmt" { script = ''
+            ${ cargo-fmt "./." }
+            ${ cargo-fmt "./demo/" }
+        '';
+    };
+
+    check-clippy = mkTask "check-clippy" { script = ''
+            ${ cargo-clippy "./." }
+            ${ cargo-clippy "./demo/" }
+       '';
+    };
 
     run-examples = mkTask "run-examples" {
         script = /*bash*/ ''
@@ -29,7 +56,7 @@ rec {
         script = /*bash*/ ''
             ls ./examples | xargs -I{} bash -c \
                 "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast | diff - tests/{}.ast || exit 1" \
-                || { echo "Example AST has changed." && exit 1 ; }
+                || { echo "Example AST has changed." ; exit 1 ; }
             '';
         depends = [ build ];
     };
@@ -85,9 +112,18 @@ rec {
         '';
         depends = [
             demo-build
-            demo-generate-favicon
         ];
     };
 
-    gen-scripts = task-lib.gen.gen-scripts "gen-scripts";
+    gen-scripts = gen.gen-scripts "gen-scripts";
+
+    pre-push = mkSeq "pre-push" [
+        check-fmt
+        check-clippy
+        check-examples
+        gen-scripts
+        demo-generate-favicon
+        (task-lib.gen.check-no-uncommited "Please commit your changes before pushing.")
+    ];
+
 }

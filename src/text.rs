@@ -15,7 +15,7 @@ impl Span {
         Self::new(start, end)
     }
 
-    pub fn slice<'a>(&self, source: &'a String) -> &'a str {
+    pub fn slice<'a>(&self, source: &'a str) -> &'a str {
         &source[self.start..self.end]
     }
 }

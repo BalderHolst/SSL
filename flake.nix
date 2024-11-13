@@ -20,6 +20,8 @@ rec {
                 gen-scripts = with task-lib; mkGenScriptsApp {
                     "scripts/build.sh" = mkScript tasks.build;
                     "scripts/package.sh" = mkScript tasks.demo-package;
+                    ".hooks/pre-commit" = mkScript tasks.check-fmt;
+                    ".hooks/pre-push" = mkScript tasks.pre-push;
                 };
             };
 
@@ -27,6 +29,8 @@ rec {
                 buildInputs = [
                     wasm-pack     # Rust wasm packager
                     rustc-wasm32  # Rust wasm target
+                    cargo         # Rust package manager
+                    clippy        # Rust linter
                     lld           # Wasm linker
                     python3       # For web development server
                     inotify-tools # For live reloading
@@ -34,6 +38,7 @@ rec {
 
                 shellHook = ''
                     echo -e "${description}\n"
+                    git config --local core.hooksPath .hooks
                 '' + task-lib.mkShellHook tasks;
             };
 

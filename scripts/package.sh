@@ -12,15 +12,6 @@ echo "--->> Running 'demo-build'"
 wasm-pack build --target web "`git rev-parse --show-toplevel`/demo"
 
 
-echo "--->> Running 'demo-generate-favicon'"
-# Dependencies for demo-generate-favicon
-
-# Run demo-generate-favicon task
-root="`git rev-parse --show-toplevel`"
-echo "Stupid Shader Language" | cargo run -- /dev/stdin -W 100 -H 100 -o $root/demo/favicon.png
-mv -v $root/demo/favicon.png $root/demo/favicon.ico
-
-
 # Run demo-package task
 root="`git rev-parse --show-toplevel`"
 mkdir -p "$root/demo/public"

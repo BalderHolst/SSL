@@ -1,6 +1,4 @@
 use wasm_bindgen::prelude::*;
-use ssl;
-
 
 const WIDTH: usize = 800;
 const HEIGHT: usize = 800;
@@ -29,7 +27,7 @@ pub fn get_buffer_size() -> usize {
 }
 
 pub fn get_index(x: usize, y: usize) -> usize {
-    (y * WIDTH + x)*PIXEL_WIDTH
+    (y * WIDTH + x) * PIXEL_WIDTH
 }
 
 #[wasm_bindgen]
