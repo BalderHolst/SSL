@@ -1,4 +1,4 @@
-pub const DEFAULT_DIM: (usize, usize) = (0, 5);
+pub const DEFAULT_DIM: (usize, usize) = (0, 3);
 
 pub const DEFAULT_WIDTH: u32 = get_default_size().0;
 pub const DEFAULT_HEIGHT: u32 = get_default_size().1;

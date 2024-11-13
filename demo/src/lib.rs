@@ -36,6 +36,22 @@ pub fn canvas_aspect_ratio() -> usize {
 }
 
 #[wasm_bindgen]
+pub fn aspect_ratio_strings() -> Vec<String> {
+    IMAGE_SIZES
+        .iter()
+        .map(|(name, _)| name.to_string())
+        .collect()
+}
+
+#[wasm_bindgen]
+pub fn dim_strings(aspect_ratio: usize) -> Vec<String> {
+    IMAGE_SIZES
+        .get(aspect_ratio)
+        .map(|(_, sizes)| sizes.iter().map(|(w, h)| format!("{}x{}", w, h)).collect())
+        .unwrap_or_default()
+}
+
+#[wasm_bindgen]
 pub fn canvas_resolution() -> usize {
     unsafe { DIM.1 }
 }
@@ -81,7 +97,7 @@ pub fn render(code: String, aspect_ratio: usize, size_index: usize) {
     for y in 0..height {
         for x in 0..width {
             let index = get_index(x, y, width);
-            let pixel = image.get_pixel(x as u32, y as u32);
+            let pixel = image.get_pixel(x, y);
             unsafe {
                 STATIC[index] = pixel[0];
                 STATIC[index + 1] = pixel[1];

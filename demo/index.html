@@ -3,13 +3,11 @@
     <head>
         <meta charset="utf-8" />
         <title>Stupid Shader Language</title>
-        <link rel="stylesheet" href="index.css" />
+        <link rel="stylesheet" href="styles.css" />
         <link rel="icon" href="favicon.ico" type="image/x-icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <script src="index.js" type="module"></script>
-
         <div class="centered">
 
             <div class="wrapper">
@@ -20,8 +18,10 @@
                 </div>
 
                 <div class="buttons">
-                    <button title="ctrl+enter" id="run">Run</button>
-                    <button id="save">Save</button>
+                    <button class="control" title="ctrl+enter" id="run">Run</button>
+                    <button class="control" id="save">Save</button>
+                    <select class="control" id="aspect-ratio"></select>
+                    <select class="control" id="resolution"></select>
                 </div>
 
                 <textarea id="code" placeholder="Write anything..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
@@ -30,6 +30,6 @@
             </div>
 
         <div>
-
+        <script src="index.js" type="module"></script>
     </body>
 </html>

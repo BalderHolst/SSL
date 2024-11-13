@@ -18,6 +18,6 @@ mkdir -p "$root/demo/public"
 cp -rv "$root/demo/pkg" "$root/demo/public"
 cp -v "$root/demo/favicon.ico" "$root/demo/public"
 cp -v "$root/demo/index.html" "$root/demo/public"
-cp -v "$root/demo/index.css" "$root/demo/public"
+cp -v "$root/demo/styles.css" "$root/demo/public"
 cp -v "$root/demo/index.js" "$root/demo/public"
 
