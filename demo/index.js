@@ -108,3 +108,16 @@ document.getElementById("code").addEventListener("keydown", (event) => {
         if (render_to_canvas) render_to_canvas(code);
     }
 });
+
+// Auto grow textarea
+document.getElementById("code").addEventListener('input', function () {
+    // Save the scroll position
+    const scrollPosition = window.scrollY;
+
+    // Adjust the height
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+
+    // Restore the scroll position
+    window.scrollTo(0, scrollPosition);
+});
