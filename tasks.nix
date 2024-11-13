@@ -95,7 +95,7 @@ rec {
     demo-generate-favicon = mkTask "demo-generate-favicon" {
         script = /*bash*/ ''
             root="`${root}`"
-            echo "Stupid Shader Language" | cargo run -- /dev/stdin -W 100 -H 100 -o $root/demo/favicon.png
+            echo "Stupid Shader Language" | cargo run -- /dev/stdin -W 16 -H 16 -o $root/demo/favicon.png
             mv -v $root/demo/favicon.png $root/demo/favicon.ico
         '';
     };
