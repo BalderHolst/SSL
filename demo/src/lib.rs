@@ -1,19 +1,43 @@
+mod sizes;
+
+use sizes::{DEFAULT_DIM, DEFAULT_HEIGHT, DEFAULT_WIDTH, IMAGE_SIZES, MAX_SIZE};
 use wasm_bindgen::prelude::*;
 
-const WIDTH: usize = 800;
-const HEIGHT: usize = 800;
-const PIXEL_WIDTH: usize = 4;
+const PIXEL_WIDTH: u32 = 4;
 
-static mut STATIC: [u8; WIDTH * HEIGHT * PIXEL_WIDTH] = [0; WIDTH * HEIGHT * PIXEL_WIDTH];
+static mut DIM: (usize, usize) = DEFAULT_DIM;
+static mut STATIC: [u8; (MAX_SIZE * PIXEL_WIDTH) as usize] = [0; (MAX_SIZE * PIXEL_WIDTH) as usize];
 
-#[wasm_bindgen]
-pub fn canvas_width() -> usize {
-    WIDTH
+// console.log
+macro_rules! console_log {
+    ($($t:tt)*) => (web_sys::console::log_1(&format!($($t)*).into()))
+}
+
+pub fn canvas_size() -> (u32, u32) {
+    unsafe {
+        let (r, i) = DIM;
+        (|| IMAGE_SIZES.get(r)?.1.get(i).cloned())().unwrap_or((DEFAULT_WIDTH, DEFAULT_HEIGHT))
+    }
 }
 
 #[wasm_bindgen]
-pub fn canvas_height() -> usize {
-    HEIGHT
+pub fn canvas_width() -> u32 {
+    canvas_size().0
+}
+
+#[wasm_bindgen]
+pub fn canvas_height() -> u32 {
+    canvas_size().1
+}
+
+#[wasm_bindgen]
+pub fn canvas_aspect_ratio() -> usize {
+    unsafe { DIM.0 }
+}
+
+#[wasm_bindgen]
+pub fn canvas_resolution() -> usize {
+    unsafe { DIM.1 }
 }
 
 #[wasm_bindgen]
@@ -22,22 +46,41 @@ pub fn get_buffer_ptr() -> *const u8 {
 }
 
 #[wasm_bindgen]
-pub fn get_buffer_size() -> usize {
-    unsafe { STATIC.len() }
+pub fn get_buffer_size() -> u32 {
+    let (width, height) = canvas_size();
+    width * height * PIXEL_WIDTH
 }
 
-pub fn get_index(x: usize, y: usize) -> usize {
-    (y * WIDTH + x) * PIXEL_WIDTH
+fn set_size(aspect_ratio: usize, size_index: usize) {
+    if aspect_ratio >= IMAGE_SIZES.len() {
+        console_log!("Invalid aspect ratio: {}", aspect_ratio);
+        return;
+    }
+    if size_index >= IMAGE_SIZES[aspect_ratio].1.len() {
+        console_log!("Invalid size index: {}", size_index);
+        return;
+    }
+    unsafe {
+        DIM = (aspect_ratio, size_index);
+    }
+}
+
+pub fn get_index(x: u32, y: u32, width: u32) -> usize {
+    ((y * width + x) * PIXEL_WIDTH) as usize
 }
 
 #[wasm_bindgen]
-pub fn render(code: String) {
-    let expr = ssl::parse_source(code);
-    let image = ssl::render(&expr, WIDTH as u32, HEIGHT as u32);
+pub fn render(code: String, aspect_ratio: usize, size_index: usize) {
+    set_size(aspect_ratio, size_index);
 
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
-            let index = get_index(x, y);
+    let expr = ssl::parse_source(code);
+
+    let (width, height) = canvas_size();
+    let image = ssl::render(&expr, width, height);
+
+    for y in 0..height {
+        for x in 0..width {
+            let index = get_index(x, y, width);
             let pixel = image.get_pixel(x as u32, y as u32);
             unsafe {
                 STATIC[index] = pixel[0];

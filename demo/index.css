@@ -13,7 +13,7 @@ body {
 .wrapper {
     /* Center children horizontally */
     max-width: 800px;
-    width: 50%;
+    width: 60%;
     display: grid;
     grid-auto-flow: row;
     gap: 10px;

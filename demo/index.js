@@ -1,10 +1,19 @@
-import init, { render, get_buffer_ptr, get_buffer_size, canvas_width, canvas_height } from "./pkg/ssl_demo.js";
+import init, {
+    render,
+    get_buffer_ptr,
+    get_buffer_size,
+    canvas_width,
+    canvas_height,
+    canvas_aspect_ratio,
+    canvas_resolution
+} from "./pkg/ssl_demo.js";
+
 let render_to_canvas = undefined;
 
 const default_code_background = window.getComputedStyle(document.getElementById("code")).getPropertyValue("background");
 init().then((wasm) => {
 
-    render_to_canvas = (code) => {
+    render_to_canvas = (code, aspect_ratio, resolution) => {
         console.log("Running code: ", code);
 
         const codeElement = document.getElementById("code");
@@ -14,17 +23,18 @@ init().then((wasm) => {
 
         setTimeout(() => {
 
-            render(code);
-
-            const ptr = get_buffer_ptr();
-            const size = get_buffer_size();
-            const memory = new Uint8Array(wasm.memory.buffer);
-
-            const canvasElement = document.querySelector("canvas");
-            const canvasContext = canvasElement.getContext("2d");
+            render(code, aspect_ratio, resolution);
 
             const width = canvas_width();
             const height = canvas_height();
+
+            console.log("Rendering image of size: ", width, height);
+
+            const ptr = get_buffer_ptr();
+            const size = get_buffer_size();
+
+            const canvasElement = document.querySelector("canvas");
+            const canvasContext = canvasElement.getContext("2d");
 
             const imageData = canvasContext.createImageData(
                 width, height
@@ -32,14 +42,10 @@ init().then((wasm) => {
 
             canvasContext.canvas.width = width;
             canvasContext.canvas.height = height;
-            canvasContext.clearRect(0, 0, width, height);
 
-            const imageDataArray = memory.slice(
-                ptr,
-                ptr + size
-            );
-
+            const imageDataArray = new Uint8Array(wasm.memory.buffer, ptr, size);
             imageData.data.set(imageDataArray);
+
             canvasContext.putImageData(imageData, 0, 0);
 
             codeElement.classList.remove("running");
@@ -49,7 +55,7 @@ init().then((wasm) => {
     };
 
     // Initial render image
-    render_to_canvas("Stupid Shader Language");
+    render_to_canvas("Stupid Shader Language", canvas_aspect_ratio(), canvas_resolution());
 });
 
 // Run button
