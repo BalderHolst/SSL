@@ -3,8 +3,8 @@ use std::rc::Rc;
 mod cornelia;
 
 use crate::{
-    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr},
-    lexer::{Token, TokenKind},
+    ast::{self, AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr},
+    lexer::{self, Token, TokenKind},
     text::Span,
 };
 
@@ -33,6 +33,15 @@ macro_rules! choice {
         )*
         unreachable!()
     })() }};
+}
+
+#[allow(dead_code)] // TODO: Find a better solution
+pub fn parse_source(source: String) -> ast::Expr {
+    let lexer = lexer::Lexer::new(source);
+    let source = lexer.source();
+    let tokens: Vec<_> = lexer.collect();
+    let mut parser = Parser::new(tokens, source.clone());
+    parser.parse_expr()
 }
 
 impl Parser {

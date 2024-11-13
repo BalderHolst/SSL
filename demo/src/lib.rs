@@ -32,7 +32,9 @@ pub fn get_index(x: usize, y: usize) -> usize {
 
 #[wasm_bindgen]
 pub fn render(code: String) {
-    let image = ssl::generate(code, WIDTH as u32, HEIGHT as u32);
+    let expr = ssl::parse_source(code);
+    let image = ssl::render(&expr, WIDTH as u32, HEIGHT as u32);
+
     for y in 0..HEIGHT {
         for x in 0..WIDTH {
             let index = get_index(x, y);

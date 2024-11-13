@@ -1,13 +1,12 @@
 use clap::Parser;
-use image_gen::generate_image;
 use std::{fs, process::exit};
 
 mod ast;
 mod cli;
 mod evaluator;
-mod image_gen;
 mod lexer;
 mod parser;
+mod renderer;
 mod text;
 
 fn main() {
@@ -33,9 +32,19 @@ fn main() {
         exit(0);
     }
 
-    let image = generate_image(expr, opts.width, opts.height);
+    const PARTS: u32 = 10;
+    let f = match opts.verbose {
+        true => |part| println!("Rendering {}% ...", (part + 1) * 100 / PARTS),
+        false => |_| {},
+    };
+    let image = renderer::render_in_parts(&expr, opts.width, opts.height, PARTS, f);
 
     let out_file = &opts.output;
+
+    if opts.verbose {
+        println!("Writing image to '{out_file}' ...");
+    }
+
     image
         .save(out_file)
         .map_err(|e| {
@@ -43,5 +52,8 @@ fn main() {
             exit(1);
         })
         .unwrap();
-    println!("Wrote image to '{out_file}'.");
+
+    if opts.verbose {
+        println!("Write successful!");
+    }
 }

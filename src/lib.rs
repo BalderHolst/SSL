@@ -1,17 +1,20 @@
 mod ast;
 mod evaluator;
-mod image_gen;
 mod lexer;
 mod parser;
+mod renderer;
 mod text;
 
+/// Create an image to be rendered into
+pub fn create_image(width: u32, height: u32) -> image::RgbImage {
+    image::RgbImage::new(width, height)
+}
+
+pub use renderer::{render, render_in_parts, render_into, render_part_into};
+
+pub use parser::parse_source;
+
 pub fn generate(source: String, width: u32, height: u32) -> image::RgbImage {
-    let lexer = lexer::Lexer::new(source);
-    let source = lexer.source();
-    let tokens: Vec<_> = lexer.collect();
-
-    let mut parser = parser::Parser::new(tokens, source.clone());
-    let expr = parser.parse_expr();
-
-    image_gen::generate_image(expr, width, height)
+    let expr = parse_source(source);
+    renderer::render(&expr, width, height)
 }
