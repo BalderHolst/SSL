@@ -24,6 +24,13 @@ fn main() {
     let source = lexer.source();
     let tokens: Vec<_> = lexer.collect();
 
+    if opts.print_tokens {
+        println!("Tokens:");
+        for token in &tokens {
+            println!("\t{:?}", token.kind);
+        }
+    }
+
     let mut parser = parser::Parser::new(tokens, source.clone());
     let expr = parser.parse_expr();
 

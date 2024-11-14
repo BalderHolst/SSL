@@ -1,0 +1,1 @@
+{Sin(Mul(Abs(X), 6)), Sin(Mul(Abs(Y), 6)), Sin(Mul(Abs(Add(X, Y)), 10))}

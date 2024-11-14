@@ -35,4 +35,8 @@ pub struct Cli {
     /// Print the generated AST
     #[arg(long("ast"))]
     pub print_ast: bool,
+
+    /// Print the generated tokens
+    #[arg(long("tokens"))]
+    pub print_tokens: bool,
 }

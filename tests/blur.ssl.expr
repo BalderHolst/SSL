@@ -1,0 +1,1 @@
+Add((Sub(0.5, Mul(Mul((Add(Mul(X, X), Mul(Y, Y))), (Add(Mul(X, X), Mul(Y, Y)))), 5))), {0.5, Sub(X, 0.5), Add(Y, 0.5)})

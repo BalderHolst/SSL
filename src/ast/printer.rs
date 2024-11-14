@@ -84,6 +84,20 @@ impl Visitor for Printer {
         self.unindent();
     }
 
+    fn visit_sin_expr(&mut self, expr: &super::SinExpr) {
+        vprintln!(self, "SinExpr:");
+        self.indent();
+        self.do_visit_sin_expr(expr);
+        self.unindent();
+    }
+
+    fn visit_cos_expr(&mut self, expr: &super::CosExpr) {
+        vprintln!(self, "CosExpr:");
+        self.indent();
+        self.do_visit_cos_expr(expr);
+        self.unindent();
+    }
+
     fn visit_number_expr(&mut self, expr: &super::NumberExpr) {
         vprintln!(self, "NumberExpr: {:?}", expr)
     }

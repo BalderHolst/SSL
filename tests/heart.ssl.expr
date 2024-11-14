@@ -1,0 +1,1 @@
+Sub(Mul((Or(Mul((LessThan(Abs(Pow((Add(Pow((Sub(Abs(X), 0.25)), 2), Pow((Add(Y, 0.3)), 2))), 0.5)), 0.3)), 1), If(GreaterThan((Add(Y, 0.133)), 0), LessThan(Add(Abs(X), Abs(Mul((Add(Y, 0.133)), 0.6))), 0.5), Sub(0, 1)))), {1, 0, 0}), {0, 10, 10})

@@ -47,7 +47,7 @@ rec {
     record-examples = mkTask "record-examples" {
         script = /*bash*/ ''
             ls ./examples | xargs -I{} bash -c \
-                "mkdir -p tests/ ; echo 'Recording example {}' ; ./target/release/ssl examples/{} --ast --dry-run > tests/{}.ast"
+                "mkdir -p tests/ ; echo 'Recording example {}' ; ./target/release/ssl examples/{} --expr --dry-run > tests/{}.expr"
             '';
         depends = [ build ];
     };
@@ -55,7 +55,7 @@ rec {
     check-examples = mkTask "check-examples" {
         script = /*bash*/ ''
             ls ./examples | xargs -I{} bash -c \
-                "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast --dry-run | diff - tests/{}.ast || exit 1" \
+                "echo 'Checking example {}' ; ./target/release/ssl examples/{} --expr --dry-run | diff - tests/{}.expr || exit 1" \
                 || { echo "Example AST has changed." ; exit 1 ; }
             '';
         depends = [ build ];
@@ -132,10 +132,10 @@ rec {
     };
 
     pre-push = mkSeq "pre-push" [
+        gen-scripts
         check-fmt
         check-clippy
         check-examples
-        gen-scripts
         demo-generate-favicon
         (task-lib.gen.check-no-uncommited "Please commit your changes before pushing.")
     ];

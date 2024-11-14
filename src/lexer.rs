@@ -133,6 +133,25 @@ impl Lexer {
     fn next(&mut self) {
         self.cursor += 1;
     }
+
+    /// Checks if the next characters make up a decimal number literal (like 2.1).
+    fn is_at_number(&self) -> bool {
+        let mut cursor = self.cursor;
+        while let Some(c) = self.source.get(cursor).copied() {
+            let c = c as char;
+            cursor += 1;
+            if c == '.' {
+                break;
+            }
+            if !c.is_ascii_digit() {
+                return false;
+            }
+        }
+        match self.source.get(cursor).copied().map(|c| c as char) {
+            Some(c) if c.is_ascii_digit() => true,
+            _ => false,
+        }
+    }
 }
 
 impl Iterator for Lexer {
@@ -171,7 +190,7 @@ impl Iterator for Lexer {
             'y' | 'Y' => token(self, TokenKind::Y),
             'a' | 'A' => token(self, TokenKind::A),
             'r' | 'R' => token(self, TokenKind::R),
-            '0'..='9' => {
+            '0'..='9' if self.is_at_number() => {
                 let mut number = String::new();
                 while let Some(c) = self.current() {
                     if c.is_ascii_digit() || c == '.' {

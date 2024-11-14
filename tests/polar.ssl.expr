@@ -1,0 +1,1 @@
+{LessThan(R, 0.5), GreaterThan(A, Div(R, 2)), A}
