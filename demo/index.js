@@ -36,6 +36,14 @@ document.getElementById("run").addEventListener("click", () => {
     render_to_canvas(code);
 });
 
+// Run code on ctrl-enter
+document.getElementById("code").addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key === "Enter") {
+        const code = document.getElementById("code").value;
+        render_to_canvas(code);
+    }
+});
+
 // Save button
 document.getElementById("save").addEventListener("click", async () => {
 
@@ -78,12 +86,17 @@ document.getElementById("save").addEventListener("click", async () => {
 
 });
 
-// Run code on ctrl-enter
-document.getElementById("code").addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key === "Enter") {
-        const code = document.getElementById("code").value;
-        render_to_canvas(code);
-    }
+// Random button
+document.getElementById("random").addEventListener("click", () => {
+    const code = document.getElementById("code");
+
+    // Generate 50 random ascii characters
+    let randomCode = Array.from( { length: 50 },
+        () => String.fromCharCode(Math.floor(Math.random() * 94) + 32)).join('');
+
+    code.value = randomCode;
+
+    render_to_canvas(code.value);
 });
 
 // Auto grow textarea
