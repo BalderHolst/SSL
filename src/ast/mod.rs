@@ -12,7 +12,7 @@ mod visitor;
 
 pub type NumberExpr = f64;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Expr {
     pub kind: ExprKind,
     pub span: Span,
@@ -46,7 +46,7 @@ impl Display for Expr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ExprKind {
     Bin(BinExpr),
     If(IfExpr),
@@ -63,7 +63,7 @@ pub enum ExprKind {
     A,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ColorExpr {
     pub r: Box<Expr>,
     pub g: Box<Expr>,
@@ -80,8 +80,7 @@ impl ColorExpr {
     }
 }
 
-#[derive(Debug)]
-#[repr(u8)]
+#[derive(Debug, Clone)]
 pub enum BinOp {
     Add,
     Sub,
@@ -112,7 +111,7 @@ impl BinOp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BinExpr {
     pub op: BinOp,
     pub lhs: Box<Expr>,
@@ -129,7 +128,7 @@ impl BinExpr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IfExpr {
     pub cond: Box<Expr>,
     pub true_expr: Box<Expr>,
@@ -149,7 +148,7 @@ impl IfExpr {
 /// Define an expression kind that simply wraps an expression.
 macro_rules! wrapper_expr {
     ($name:ident) => {
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         pub struct $name {
             pub inner: Box<Expr>,
         }

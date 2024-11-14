@@ -14,6 +14,40 @@ fn normalize(x: u32, y: u32, width: u32, height: u32) -> (f64, f64) {
     (nx, ny)
 }
 
+/// Render subimage
+pub fn render_subimage(
+    expr: &Expr,
+    x: (u32, u32),
+    y: (u32, u32),
+    width: u32,
+    height: u32,
+) -> RgbImage {
+    let (start_x, end_x) = x;
+    let (start_y, end_y) = y;
+
+    let sub_width = end_x - start_x;
+    let sub_height = end_y - start_y;
+
+    let mut image = RgbImage::new(sub_width, sub_height);
+
+    for x in 0..sub_width {
+        for y in 0..sub_height {
+            let (nx, ny) = normalize(start_x + x, start_y + y, width, height);
+            let c = eval(expr, nx, ny);
+            image.put_pixel(
+                x,
+                y,
+                Rgb([
+                    f64_color_to_u8(c.r),
+                    f64_color_to_u8(c.g),
+                    f64_color_to_u8(c.b),
+                ]),
+            );
+        }
+    }
+    image
+}
+
 /// Render a part of an expression into a provided image
 pub fn render_part_into(image: &mut RgbImage, expr: &Expr, part: u32, total_parts: u32) {
     let start_y = part * image.height() / total_parts;

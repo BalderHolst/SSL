@@ -20,6 +20,10 @@ pub struct Cli {
     #[arg(short('H'), long, default_value = "1080")]
     pub height: u32,
 
+    /// Threads
+    #[arg(short, long, default_value = "4")]
+    pub threads: u32,
+
     /// Print what is happening
     #[arg(short, long)]
     pub verbose: bool,
