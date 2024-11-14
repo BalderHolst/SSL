@@ -170,7 +170,7 @@ impl Iterator for Lexer {
                     }
                 }
                 Some(Token {
-                    kind: TokenKind::Number(number.parse().unwrap()),
+                    kind: TokenKind::Number(number.parse().expect("Invalid number parsed.")),
                     span: self.span(token_start),
                 })
             }

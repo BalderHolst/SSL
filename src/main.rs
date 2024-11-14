@@ -52,13 +52,10 @@ fn main() {
         println!("Writing image to '{out_file}' ...");
     }
 
-    image
-        .save(out_file)
-        .map_err(|e| {
-            eprintln!("Error saving image to '{}': {}", out_file, e);
-            exit(1);
-        })
-        .unwrap();
+    let _ = image.save(out_file).map_err(|e| {
+        eprintln!("Error saving image to '{}': {}", out_file, e);
+        exit(1);
+    });
 
     if opts.verbose {
         println!("Write successful!");
