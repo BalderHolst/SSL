@@ -82,11 +82,15 @@ fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + f64::exp(-2.0 * x + 0.5))
 }
 
+fn norm(x: f64) -> f64 {
+    sigmoid(x % 50.0)
+}
+
 impl Color {
     fn clamp(&mut self) {
-        self.r = sigmoid(self.r);
-        self.g = sigmoid(self.g);
-        self.b = sigmoid(self.b);
+        self.r = norm(self.r);
+        self.g = norm(self.g);
+        self.b = norm(self.b);
     }
 }
 
