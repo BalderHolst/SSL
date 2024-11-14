@@ -14,6 +14,7 @@ pub struct Parser {
     cursor: usize,
     looking_for: Vec<TokenKind>,
     seed: usize,
+    not_number: usize,
 }
 
 /// Choose an expression based on a weighted choice and a seed number.
@@ -53,13 +54,19 @@ impl Parser {
         };
 
         let l = self.looking_for.len() + 1;
+
+        let num = match self.not_number {
+            0 => 3,
+            _ => 0,
+        };
+
         choice! { n + self.seed(),
             3/l => self.parse_color(),
             1/(l*3) => self.parse_parenthesized_expr(),
             4 => expr(ExprKind::X),
             4 => expr(ExprKind::Y),
-            3 => expr(ExprKind::Number(f)),
-            2 => self.parse_if_expr(),
+            num => expr(ExprKind::Number(f)),
+            l.min(2) => self.parse_if_expr(),
             0 => self.parse_neg_expr(),
         }
     }
@@ -74,8 +81,8 @@ impl Parser {
             6 => BinOp::Pow,
             1 => BinOp::And,
             1 => BinOp::Or,
-            1 => BinOp::LessThan,
-            1 => BinOp::GreaterThan,
+            0 => BinOp::LessThan,
+            0 => BinOp::GreaterThan,
             0 => BinOp::Equal,
         }
     }
@@ -98,6 +105,7 @@ impl Parser {
             cursor: 0,
             looking_for: vec![],
             seed: 0,
+            not_number: 0,
         }
     }
 
@@ -217,6 +225,7 @@ impl Parser {
         self.consume(); // Consume 'if'
 
         self.looking_for.push(TokenKind::Then);
+        self.not_number += 1;
         let cond = self.parse_expr();
         self.looking_for.pop();
 
@@ -295,7 +304,7 @@ impl Parser {
             span: token_span,
         };
 
-        match &token.kind {
+        let expr = match &token.kind {
             TokenKind::Minus => self.parse_neg_expr(),
             TokenKind::Lparen => self.parse_parenthesized_expr(),
             TokenKind::Lbrace => self.parse_color(),
@@ -336,7 +345,11 @@ impl Parser {
                 self.parse_cornelia()
             }
             _ => self.choose_token(),
+        };
+        if self.not_number > 0 {
+            self.not_number -= 1;
         }
+        expr
     }
 
     fn get_bin_op(&mut self) -> BinOp {
@@ -385,10 +398,6 @@ impl Parser {
             Some(e) => e,
             None => self.parse_primary_expr(),
         };
-
-        if self.is_at_interest() {
-            return left;
-        }
 
         let start_span = left.span.clone();
 
