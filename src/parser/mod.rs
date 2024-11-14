@@ -322,7 +322,9 @@ impl Parser {
 
         let len = "Cornelia".len();
 
-        self.cursor += len;
+        for _ in 0..len {
+            self.consume();
+        }
 
         let span = Span {
             start: start_span.start,

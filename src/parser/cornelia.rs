@@ -95,7 +95,7 @@ pub fn cornelia_expr(span: Span) -> Expr {
                 ))),
             ))),
             expr(ExprKind::Color(ColorExpr::new(
-                expr(ExprKind::Number(10000.0)),
+                expr(ExprKind::Number(10.0)),
                 expr(ExprKind::Number(0.0)),
                 expr(ExprKind::Number(0.0)),
             ))),

@@ -2,7 +2,7 @@ Expr "(
     ( | (( |x| -0.25 )^2 + ( y+0.3 )^2)^0.5 | < 0.3 ) * 1.0
     |
     if (y+0.133) > 0 then |x|+|(y+0.133)*0.6| < 0.5 else 0-1 end
-) * {1, 0, 0} - {0, 1000, 1000}":
+) * {1, 0, 0} - {0, 10, 10}":
   BinExpr:
     operation: Sub
     left:
@@ -178,14 +178,14 @@ Expr "(
                   Expr "0":
                     NumberExpr: 0.0
     right:
-      Expr "{0, 1000, 1000}":
+      Expr "{0, 10, 10}":
         ColorExpr:
           R:
             Expr "0":
               NumberExpr: 0.0
           G:
-            Expr "1000":
-              NumberExpr: 1000.0
+            Expr "10":
+              NumberExpr: 10.0
           B:
-            Expr "1000":
-              NumberExpr: 1000.0
+            Expr "10":
+              NumberExpr: 10.0
