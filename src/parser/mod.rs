@@ -123,7 +123,7 @@ impl Parser {
     }
 
     fn seed(&mut self) -> usize {
-        self.seed += 1;
+        self.seed = self.seed.wrapping_add(1);
         self.seed
     }
 
