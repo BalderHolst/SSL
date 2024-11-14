@@ -3,7 +3,10 @@ use std::rc::Rc;
 mod cornelia;
 
 use crate::{
-    ast::{self, AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr},
+    ast::{
+        self, AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr,
+        ParenExpr, SinExpr,
+    },
     lexer::{self, Token, TokenKind},
     text::Span,
 };
@@ -36,8 +39,8 @@ macro_rules! choice {
 impl Parser {
     fn choose_token(&mut self) -> Expr {
         let mut span = Span {
-            start: self.source.len() - 1,
-            end: self.source.len() - 1,
+            start: self.source.len(),
+            end: self.source.len(),
         };
 
         let (n, f) = match self.current() {
@@ -45,7 +48,7 @@ impl Parser {
                 span = t.span.clone();
                 (t.kind.as_usize(), t.kind.as_f64())
             }
-            None => (self.seed(), ((self.seed() as f64) / 3.3) % 1.0),
+            None => (self.seed(), (((self.seed() % 100) as f64) / 100.0) % 1.0),
         };
 
         let expr = |kind: ExprKind| Expr {
@@ -61,8 +64,10 @@ impl Parser {
         };
 
         choice! { n + self.seed(),
-            3/l => self.parse_color(),
-            1/(l*3) => self.parse_parenthesized_expr(),
+            5/l => self.parse_color(),
+            2/l => self.parse_parenthesized_expr(),
+            1/l => self.parse_sin_expr(),
+            1/l => self.parse_cos_expr(),
             4 => expr(ExprKind::X),
             4 => expr(ExprKind::Y),
             num => expr(ExprKind::Number(f)),
@@ -104,7 +109,7 @@ impl Parser {
             source,
             cursor: 0,
             looking_for: vec![],
-            seed: 0,
+            seed: 10,
             not_number: 0,
         }
     }
@@ -142,12 +147,22 @@ impl Parser {
         Some(token)
     }
 
+    fn consume_if(&mut self, f: impl FnOnce(&TokenKind) -> bool) -> Option<Token> {
+        let token = self.current()?.clone();
+        if f(&token.kind) {
+            self.consume();
+            Some(token)
+        } else {
+            None
+        }
+    }
+
     fn current_span(&self) -> Span {
         match self.current() {
             Some(t) => t.span.clone(),
             None => Span {
-                start: self.source.len() - 1,
-                end: self.source.len() - 1,
+                start: self.source.len(),
+                end: self.source.len(),
             },
         }
     }
@@ -179,7 +194,7 @@ impl Parser {
             kind: ExprKind::Color(ColorExpr::new(r, g, b)),
             span: Span {
                 start: start_span.start,
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
+                end: end.map_or(self.source.len(), |t| t.span.end),
             },
         }
     }
@@ -219,6 +234,36 @@ impl Parser {
         }
     }
 
+    fn parse_function(&mut self, kind: impl FnOnce(Expr) -> ExprKind) -> Expr {
+        let start_span = self.current_span();
+        self.consume(); // Consume function name
+
+        // Consume '('
+        self.consume_if(|tk| *tk == TokenKind::Lparen);
+
+        self.looking_for.push(TokenKind::Rparen);
+        let inner = self.parse_expr();
+        self.looking_for.pop();
+
+        self.consume(); // Consume ')'
+
+        Expr {
+            kind: kind(inner),
+            span: Span {
+                start: start_span.start,
+                end: self.current_span().end,
+            },
+        }
+    }
+
+    fn parse_sin_expr(&mut self) -> Expr {
+        self.parse_function(|e| ExprKind::Sin(SinExpr::new(e)))
+    }
+
+    fn parse_cos_expr(&mut self) -> Expr {
+        self.parse_function(|e| ExprKind::Cos(CosExpr::new(e)))
+    }
+
     fn parse_if_expr(&mut self) -> Expr {
         let start_span = self.current_span();
 
@@ -247,7 +292,7 @@ impl Parser {
             kind: ExprKind::If(IfExpr::new(cond, true_expr, false_expr)),
             span: Span {
                 start: start_span.start,
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
+                end: end.map_or(self.source.len(), |t| t.span.end),
             },
         }
     }
@@ -323,6 +368,8 @@ impl Parser {
                 self.consume();
                 expr(ExprKind::Number(n))
             }
+            TokenKind::Sin => self.parse_sin_expr(),
+            TokenKind::Cos => self.parse_cos_expr(),
             TokenKind::Other('C') | TokenKind::Other('c')
                 if (
                     self.peak(1).map(|t| &t.kind),

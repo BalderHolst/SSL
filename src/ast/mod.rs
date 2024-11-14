@@ -31,8 +31,10 @@ impl Display for Expr {
         match &self.kind {
             ExprKind::Bin(e) => write!(f, "{:?}({}, {})", e.op, e.lhs, e.rhs),
             ExprKind::Paren(e) => write!(f, "({})", e.inner),
-            ExprKind::Neg(e) => write!(f, "neg({})", e.inner),
-            ExprKind::Abs(e) => write!(f, "abs({})", e.inner),
+            ExprKind::Neg(e) => write!(f, "Neg({})", e.inner),
+            ExprKind::Abs(e) => write!(f, "Abs({})", e.inner),
+            ExprKind::Sin(e) => write!(f, "Sin({})", e.inner),
+            ExprKind::Cos(e) => write!(f, "Cos({})", e.inner),
             ExprKind::Color(e) => write!(f, "{{{}, {}, {}}}", e.r, e.g, e.b),
             ExprKind::If(e) => write!(f, "If({}, {}, {})", e.cond, e.true_expr, e.false_expr),
             ExprKind::Number(n) => write!(f, "{n}"),
@@ -51,6 +53,8 @@ pub enum ExprKind {
     Paren(ParenExpr),
     Neg(NegExpr),
     Abs(AbsExpr),
+    Sin(SinExpr),
+    Cos(CosExpr),
     X,
     Y,
 }
@@ -140,41 +144,26 @@ impl IfExpr {
     }
 }
 
-#[derive(Debug)]
-pub struct ParenExpr {
-    pub inner: Box<Expr>,
-}
-
-impl ParenExpr {
-    pub fn new(inner: Expr) -> Self {
-        Self {
-            inner: Box::new(inner),
+/// Define an expression kind that simply wraps an expression.
+macro_rules! wrapper_expr {
+    ($name:ident) => {
+        #[derive(Debug)]
+        pub struct $name {
+            pub inner: Box<Expr>,
         }
-    }
-}
 
-#[derive(Debug)]
-pub struct NegExpr {
-    pub inner: Box<Expr>,
-}
-
-impl NegExpr {
-    pub fn new(inner: Expr) -> Self {
-        Self {
-            inner: Box::new(inner),
+        impl $name {
+            pub fn new(inner: Expr) -> Self {
+                Self {
+                    inner: Box::new(inner),
+                }
+            }
         }
-    }
+    };
 }
 
-#[derive(Debug)]
-pub struct AbsExpr {
-    pub inner: Box<Expr>,
-}
-
-impl AbsExpr {
-    pub fn new(inner: Expr) -> Self {
-        Self {
-            inner: Box::new(inner),
-        }
-    }
-}
+wrapper_expr!(ParenExpr);
+wrapper_expr!(NegExpr);
+wrapper_expr!(AbsExpr);
+wrapper_expr!(SinExpr);
+wrapper_expr!(CosExpr);

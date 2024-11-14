@@ -19,6 +19,28 @@ fn bool_to_f64(b: bool) -> f64 {
     }
 }
 
+macro_rules! color {
+    ($r:expr, $g:expr, $b:expr) => {
+        Result::Color(Color {
+            r: $r,
+            g: $g,
+            b: $b,
+        })
+    };
+}
+
+macro_rules! number {
+    ($n:expr) => {
+        Result::Number($n)
+    };
+}
+
+macro_rules! bool {
+    ($n:expr) => {
+        Result::Bool($n)
+    };
+}
+
 impl Result {
     fn as_number(&self) -> f64 {
         match self {
@@ -69,6 +91,14 @@ impl Result {
             Result::Bool(_) => {}
         }
     }
+
+    fn call(&mut self, f: impl Fn(f64) -> f64) -> Result {
+        match self {
+            Result::Color(c) => color!(f(c.r), f(c.g), f(c.b)),
+            Result::Number(n) => number!(f(*n)),
+            Result::Bool(b) => number!(f(bool_to_f64(*b))),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
@@ -92,28 +122,6 @@ impl Color {
         self.g = norm(self.g);
         self.b = norm(self.b);
     }
-}
-
-macro_rules! color {
-    ($r:expr, $g:expr, $b:expr) => {
-        Result::Color(Color {
-            r: $r,
-            g: $g,
-            b: $b,
-        })
-    };
-}
-
-macro_rules! number {
-    ($n:expr) => {
-        Result::Number($n)
-    };
-}
-
-macro_rules! bool {
-    ($n:expr) => {
-        Result::Bool($n)
-    };
 }
 
 macro_rules! impl_trait_op {
@@ -344,6 +352,8 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
                 eval_expr(&e.false_expr, x, y)
             }
         }
+        ExprKind::Sin(e) => eval_expr(&e.inner, x, y).call(f64::sin),
+        ExprKind::Cos(e) => eval_expr(&e.inner, x, y).call(f64::cos),
     };
     res.nan_to_zero();
     res

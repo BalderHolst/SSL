@@ -35,6 +35,9 @@ pub enum TokenKind {
 
     Comma,
 
+    Sin,
+    Cos,
+
     If,
     Then,
     Else,
@@ -68,10 +71,12 @@ impl TokenKind {
             TokenKind::And => 17,
             TokenKind::Comma => 18,
             TokenKind::Whitespace => 19,
-            TokenKind::If => 20,
-            TokenKind::Then => 21,
-            TokenKind::Else => 22,
-            TokenKind::End => 23,
+            TokenKind::Sin => 20,
+            TokenKind::Cos => 21,
+            TokenKind::If => 22,
+            TokenKind::Then => 23,
+            TokenKind::Else => 24,
+            TokenKind::End => 25,
             TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
             TokenKind::Other(c) => (*c) as usize,
         }
@@ -188,9 +193,12 @@ impl Iterator for Lexer {
                     [Some('t'), Some('h'), Some('e'), Some('n')] => (4, token(self, TokenKind::Then)),
                     [Some('e'), Some('l'), Some('s'), Some('e')] => (4, token(self, TokenKind::Else)),
                     [Some('e'), Some('n'), Some('d'),         _] => (3, token(self, TokenKind::End)),
+                    [Some('s'), Some('i'), Some('n'),         _] => (3, token(self, TokenKind::Sin)),
+                    [Some('c'), Some('o'), Some('s'),         _] => (3, token(self, TokenKind::Cos)),
                     _ => return token(self, TokenKind::Other(c)),
                 };
-                self.cursor += size;
+                // Subtract one because `token` already increments the cursor.
+                self.cursor += size - 1;
                 token
             }
         }

@@ -10,6 +10,8 @@ pub trait Visitor {
             super::ExprKind::Paren(e) => self.visit_paren_expr(e),
             super::ExprKind::Neg(e) => self.visit_neg_expr(e),
             super::ExprKind::Abs(e) => self.visit_abs_expr(e),
+            super::ExprKind::Sin(e) => self.visit_sin_expr(e),
+            super::ExprKind::Cos(e) => self.visit_cos_expr(e),
             super::ExprKind::Number(e) => self.visit_number_expr(e),
             super::ExprKind::Color(e) => self.visit_color_expr(e),
             super::ExprKind::X => self.visit_x_expr(),
@@ -44,6 +46,20 @@ pub trait Visitor {
         self.do_visit_abs_expr(expr);
     }
     fn do_visit_abs_expr(&mut self, expr: &super::AbsExpr) {
+        self.visit_expr(&expr.inner)
+    }
+
+    fn visit_sin_expr(&mut self, expr: &super::SinExpr) {
+        self.do_visit_sin_expr(expr);
+    }
+    fn do_visit_sin_expr(&mut self, expr: &super::SinExpr) {
+        self.visit_expr(&expr.inner)
+    }
+
+    fn visit_cos_expr(&mut self, expr: &super::CosExpr) {
+        self.do_visit_cos_expr(expr);
+    }
+    fn do_visit_cos_expr(&mut self, expr: &super::CosExpr) {
         self.visit_expr(&expr.inner)
     }
 
