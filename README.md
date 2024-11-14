@@ -3,6 +3,8 @@ A "shader-language" that always compiles, for better or worse.
 
 It also does not run on the GPU... yet...
 
+![Image Representation of Readme|500](./readme.png)
+
 Check out the [live demo](https://balderholst.github.io/SSL/)!
 
 ## Idea

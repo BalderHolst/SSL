@@ -50,6 +50,14 @@ ls ./examples | xargs -I{} bash -c \
     || { echo "Example AST has changed." ; exit 1 ; }
 
 
+echo "--->> Running 'generate-readme-image'"
+# Dependencies for generate-readme-image
+
+# Run generate-readme-image task
+root="`git rev-parse --show-toplevel`"
+cargo run -- "$root/README.md" -W 500 -H 500 --output "$root/readme.png"
+
+
 echo "--->> Running 'demo-generate-favicon'"
 # Dependencies for demo-generate-favicon
 

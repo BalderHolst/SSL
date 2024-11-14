@@ -123,6 +123,13 @@ rec {
         ];
     };
 
+    generate-readme-image = mkTask "generate-readme-image" {
+        script = /*bash*/ ''
+            root="`${root}`"
+            cargo run -- "$root/README.md" -W 500 -H 500 --output "$root/readme.png"
+        '';
+    };
+
     gen-scripts = gen.gen-scripts "gen-scripts";
 
     gen-random = mkTask "gen-random" {
@@ -144,6 +151,7 @@ rec {
         check-fmt
         check-clippy
         check-examples
+        generate-readme-image
         demo-generate-favicon
         (task-lib.gen.check-no-uncommited "Please commit your changes before pushing.")
     ];
