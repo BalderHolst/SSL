@@ -24,6 +24,11 @@ rec {
 
     build = mkTask "build" { script = cargo-build "./."; };
 
+    document-lib = mkTask "document" { script = /*bash*/ ''
+        rm -rf target/doc
+        cargo doc --no-deps
+    ''; };
+
     check-fmt = mkTask "check-fmt" { script = ''
             ${ cargo-fmt "./." }
             ${ cargo-fmt "./demo/" }
@@ -74,9 +79,7 @@ rec {
     };
 
     demo-serve = mkTask "demo-serve" {
-        script = /*bash*/ ''
-            cd "`${root}`/demo" && python3 -m http.server
-        '';
+        script = /*bash*/ '' python3 -m http.server '';
         depends = [ demo-build ];
     };
 
@@ -103,14 +106,19 @@ rec {
     demo-package = mkTask "demo-package" {
         script = /*bash*/ ''
             root="`${root}`"
-            mkdir -p "$root/demo/public"
-            cp -rv "$root/demo/pkg" "$root/demo/public"
-            cp -v "$root/demo/favicon.ico" "$root/demo/public"
-            cp -v "$root/demo/index.html" "$root/demo/public"
-            cp -v "$root/demo/styles.css" "$root/demo/public"
-            cp -v "$root/demo/index.js" "$root/demo/public"
+            output="$root/public"
+            mkdir -p "$output"
+            echo "Copying demo files to $output"
+            cp -r "$root/demo/pkg" "$output"
+            cp "$root/demo/favicon.ico" "$output"
+            cp "$root/demo/index.html" "$output"
+            cp "$root/demo/styles.css" "$output"
+            cp "$root/demo/index.js" "$output"
+            echo "Copying documentation to $output/doc"
+            cp -r "$root/target/doc" "$output/doc"
         '';
         depends = [
+            document-lib
             demo-build
         ];
     };

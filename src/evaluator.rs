@@ -6,6 +6,7 @@ use std::{
 
 use crate::ast::{BinOp, Expr, ExprKind};
 
+/// Result of evaluating an expression.
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum Result {
     Color(Color),
@@ -13,6 +14,7 @@ pub enum Result {
     Bool(bool),
 }
 
+/// Cast an SSL boolean to a float.
 fn bool_to_f64(b: bool) -> f64 {
     match b {
         true => 1.0,
@@ -20,6 +22,7 @@ fn bool_to_f64(b: bool) -> f64 {
     }
 }
 
+/// Create a color result.
 macro_rules! color {
     ($r:expr, $g:expr, $b:expr) => {
         Result::Color(Color {
@@ -30,12 +33,14 @@ macro_rules! color {
     };
 }
 
+/// Create a number result.
 macro_rules! number {
     ($n:expr) => {
         Result::Number($n)
     };
 }
 
+/// Create a boolean result.
 macro_rules! bool {
     ($n:expr) => {
         Result::Bool($n)
@@ -43,6 +48,7 @@ macro_rules! bool {
 }
 
 impl Result {
+    /// Cast the result to a number.
     fn as_number(&self) -> f64 {
         match self {
             Result::Color(c) => (c.r + c.g + c.b) / 3.0,
@@ -51,6 +57,7 @@ impl Result {
         }
     }
 
+    /// Cast the result to a color.
     fn as_color(&self) -> Color {
         match self {
             Result::Color(c) => c.clone(),
@@ -67,6 +74,7 @@ impl Result {
         }
     }
 
+    /// Cast the result to a boolean.
     fn as_bool(&self) -> bool {
         match self {
             Result::Color(_) => self.as_number() >= 0.0,
@@ -75,6 +83,7 @@ impl Result {
         }
     }
 
+    /// Convert NaN values to zero.
     fn nan_to_zero(&mut self) {
         fn zero_if_nan(n: &mut f64) {
             if n.is_nan() {
@@ -93,6 +102,7 @@ impl Result {
         }
     }
 
+    /// Call a function on the result.
     fn call(&mut self, f: impl Fn(f64) -> f64) -> Result {
         match self {
             Result::Color(c) => color!(f(c.r), f(c.g), f(c.b)),
@@ -102,6 +112,7 @@ impl Result {
     }
 }
 
+/// An RGB color.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Color {
     pub r: f64,
@@ -109,15 +120,18 @@ pub struct Color {
     pub b: f64,
 }
 
+/// The sigmoid function. Used to clamp color values.
 fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + f64::exp(-2.0 * x + 0.5))
 }
 
+/// Normalize a value to the range [-1, 1].
 fn norm(x: f64) -> f64 {
     sigmoid(x % 50.0)
 }
 
 impl Color {
+    /// Clamp the color values to the range [0, 1].
     fn clamp(&mut self) {
         self.r = norm(self.r);
         self.g = norm(self.g);
@@ -125,6 +139,7 @@ impl Color {
     }
 }
 
+/// Implement arithmetic operations for `Result` that have an associated trait.
 macro_rules! impl_trait_op {
     ($struct:ident, $trait:ident, $method:ident) => {
         impl $trait for $struct {
@@ -164,6 +179,7 @@ impl_trait_op!(Result, Sub, sub);
 impl_trait_op!(Result, Mul, mul);
 impl_trait_op!(Result, Div, div);
 
+/// Implement arithmetic operations for `Result` that return a float and have a symbol.
 macro_rules! impl_float_op {
     ($struct:ident, $name:ident, $sym:tt) => {
         impl $struct {
@@ -200,6 +216,7 @@ macro_rules! impl_float_op {
 }
 impl_float_op!(Result, fmod, %);
 
+/// Implement comparison operations for `Result`.
 macro_rules! impl_bin_op {
     ($struct:ident, $name:ident, $sym:tt) => {
         impl $struct {
@@ -254,6 +271,7 @@ impl_bin_op!(Result, less, <);
 impl_bin_op!(Result, greater, >);
 
 impl Result {
+    /// Raise the result to a power.
     fn pow(&self, other: Self) -> Self {
         match (self, other) {
             (Result::Color(c1), Result::Color(c2)) => {
@@ -280,6 +298,7 @@ impl Result {
         }
     }
 
+    /// The absolute value.
     fn abs(&self) -> Self {
         match self {
             Result::Color(c) => {
@@ -290,6 +309,7 @@ impl Result {
         }
     }
 
+    /// The OR operation.
     fn or(self, other: Self) -> Self {
         if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
             return bool!(*b1 || *b2);
@@ -301,6 +321,7 @@ impl Result {
         }
     }
 
+    // The AND operation.
     fn and(self, other: Self) -> Self {
         if let (Self::Bool(b1), Self::Bool(b2)) = (&self, &other) {
             return bool!(*b1 && *b2);
@@ -313,6 +334,7 @@ impl Result {
     }
 }
 
+/// Evaluate an expression.
 fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
     let mut res = match &expr.kind {
         ExprKind::Bin(e) => {
@@ -360,6 +382,7 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
     res
 }
 
+/// Evaluate an expression at a given point and return the clamped color.
 pub fn eval(expr: &Expr, x: f64, y: f64) -> Color {
     let mut res = eval_expr(expr, x, y).as_color();
     res.clamp();

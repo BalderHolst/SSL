@@ -38,7 +38,7 @@ macro_rules! vprintln {
 
 impl Visitor for Printer {
     fn visit_expr(&mut self, expr: &Expr) {
-        vprintln!(self, "Expr \"{}\":", expr.span.slice(&self.source));
+        vprintln!(self, "Expr \"{}\":", expr.span.get_string(&self.source));
         self.indent();
         self.do_visit_expr(expr);
         self.unindent()

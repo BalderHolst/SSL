@@ -1,3 +1,7 @@
+//! A library for generating images from a random input.
+
+#![warn(missing_docs)]
+
 mod ast;
 mod evaluator;
 mod lexer;
@@ -14,6 +18,7 @@ pub use renderer::{render, render_in_parts, render_into, render_part_into};
 
 pub use parser::parse_source;
 
+/// Generate an image from a source string
 pub fn generate(source: String, width: u32, height: u32) -> image::RgbImage {
     let expr = parse_source(source);
     renderer::render(&expr, width, height)

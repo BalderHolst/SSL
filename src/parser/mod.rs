@@ -1,3 +1,5 @@
+//! Parser implementation for the SSL language
+
 use std::rc::Rc;
 
 mod cornelia;
@@ -11,6 +13,7 @@ use crate::{
     text::Span,
 };
 
+/// Parser for SSL
 pub struct Parser {
     source: Rc<Vec<u8>>,
     tokens: Vec<Token>,
@@ -94,6 +97,7 @@ impl Parser {
     }
 }
 
+/// Parse source code into an expression
 #[allow(dead_code)] // TODO: Find a better solution
 pub fn parse_source(source: String) -> ast::Expr {
     let lexer = lexer::Lexer::new(source);

@@ -1,13 +1,17 @@
+//! Lexer/tokenization implementation for SSL. The lexer converts source code into tokens. This lexer is byte-oriented because SSL input can be any data.
+
 use std::rc::Rc;
 
 use crate::text::Span;
 
+/// A language token.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token {
     pub kind: TokenKind,
     pub span: Span,
 }
 
+/// Kinds of token.
 #[derive(Debug, PartialEq, Clone)]
 pub enum TokenKind {
     Plus,
@@ -51,6 +55,7 @@ pub enum TokenKind {
 }
 
 impl TokenKind {
+    /// Converts the token kind into a [usize].
     #[rustfmt::skip]
     pub fn as_usize(&self) -> usize {
         match self {
@@ -87,6 +92,7 @@ impl TokenKind {
         }
     }
 
+    /// Converts the token kind into a [f64].
     pub fn as_f64(&self) -> f64 {
         match self {
             TokenKind::Number(n) => *n,
@@ -95,12 +101,14 @@ impl TokenKind {
     }
 }
 
+/// The lexer for the SSL language.
 pub struct Lexer {
     source: Rc<Vec<u8>>,
     cursor: usize,
 }
 
 impl Lexer {
+    /// Create a new lexer from a source string.
     pub fn new(source: String) -> Self {
         Self {
             source: Rc::new(source.into_bytes()),
@@ -108,14 +116,17 @@ impl Lexer {
         }
     }
 
+    /// Get the source of the lexer.
     pub fn source(&self) -> Rc<Vec<u8>> {
         Rc::clone(&self.source)
     }
 
+    /// Get the current character. Returns [None] if the cursor is at the end of the source.
     fn current(&self) -> Option<char> {
         self.source.get(self.cursor).copied().map(Into::into)
     }
 
+    /// Peak at a character at an offset from the cursor.
     fn peak(&self, offset: isize) -> Option<char> {
         self.source
             .get((self.cursor as isize + offset) as usize)
@@ -123,15 +134,17 @@ impl Lexer {
             .map(Into::into)
     }
 
+    /// Move the cursor to the next character.
+    fn next(&mut self) {
+        self.cursor += 1;
+    }
+
+    /// Get the span from the start to the current cursor.
     fn span(&self, start: usize) -> Span {
         Span {
             start,
             end: self.cursor,
         }
-    }
-
-    fn next(&mut self) {
-        self.cursor += 1;
     }
 
     /// Checks if the next characters make up a decimal number literal (like 2.1).
@@ -154,6 +167,7 @@ impl Lexer {
 impl Iterator for Lexer {
     type Item = Token;
 
+    /// Get the next token from the lexer.
     fn next(&mut self) -> Option<Self::Item> {
         let token_start = self.cursor;
 

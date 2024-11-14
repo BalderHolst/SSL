@@ -1,3 +1,5 @@
+//! Abstract syntax tree for the SSL language.
+
 use core::fmt;
 use std::{
     fmt::{Display, Formatter},
@@ -10,8 +12,10 @@ use visitor::Visitor;
 mod printer;
 mod visitor;
 
+/// A number expression
 pub type NumberExpr = f64;
 
+/// An SSL expression
 #[derive(Debug, Clone)]
 pub struct Expr {
     pub kind: ExprKind,
@@ -19,6 +23,7 @@ pub struct Expr {
 }
 
 impl Expr {
+    /// Print the AST of the expression. This is a lot of output.
     #[allow(dead_code)]
     pub fn print_ast(&self, source: Rc<Vec<u8>>) {
         let mut printer = printer::Printer::new(source);
@@ -46,6 +51,7 @@ impl Display for Expr {
     }
 }
 
+/// The kind of an expression.
 #[derive(Debug, Clone)]
 pub enum ExprKind {
     Bin(BinExpr),
@@ -63,6 +69,7 @@ pub enum ExprKind {
     A,
 }
 
+/// Color expression. Syntax: `{r, g, b}`.
 #[derive(Debug, Clone)]
 pub struct ColorExpr {
     pub r: Box<Expr>,
@@ -80,6 +87,7 @@ impl ColorExpr {
     }
 }
 
+/// Operator for binary expressions. The precedence is used to determine the order of operations.
 #[derive(Debug, Clone)]
 pub enum BinOp {
     Add,
@@ -95,6 +103,7 @@ pub enum BinOp {
 }
 
 impl BinOp {
+    /// Get the precedence of the operator.
     pub fn precedence(&self) -> u8 {
         match self {
             Self::LessThan => 0,
@@ -111,6 +120,7 @@ impl BinOp {
     }
 }
 
+/// A binary expression.
 #[derive(Debug, Clone)]
 pub struct BinExpr {
     pub op: BinOp,
@@ -128,6 +138,7 @@ impl BinExpr {
     }
 }
 
+/// An if expression. Syntax: `if <cond> then <true_expr> else <false_expr>`.
 #[derive(Debug, Clone)]
 pub struct IfExpr {
     pub cond: Box<Expr>,
@@ -147,7 +158,8 @@ impl IfExpr {
 
 /// Define an expression kind that simply wraps an expression.
 macro_rules! wrapper_expr {
-    ($name:ident) => {
+    ($name:ident: $doc:literal) => {
+        #[doc = $doc]
         #[derive(Debug, Clone)]
         pub struct $name {
             pub inner: Box<Expr>,
@@ -163,8 +175,8 @@ macro_rules! wrapper_expr {
     };
 }
 
-wrapper_expr!(ParenExpr);
-wrapper_expr!(NegExpr);
-wrapper_expr!(AbsExpr);
-wrapper_expr!(SinExpr);
-wrapper_expr!(CosExpr);
+wrapper_expr!(ParenExpr: "Parenthesised expression. Syntax: `(<expr>)`.");
+wrapper_expr!(NegExpr: "Negated expression. Syntax: `-<expr>`.");
+wrapper_expr!(AbsExpr: "Absolute value expression. Syntax: `abs(<expr>)`.");
+wrapper_expr!(SinExpr: "Sine expression. Syntax: `sin(<expr>)`.");
+wrapper_expr!(CosExpr: "Cosine expression. Syntax: `cos(<expr>)`.");

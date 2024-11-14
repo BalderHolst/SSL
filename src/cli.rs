@@ -1,7 +1,10 @@
+//! Command line interface implementation
+
 use std::path::PathBuf;
 
 use clap::Parser;
 
+/// Command line interface
 #[derive(Debug, Parser)]
 pub struct Cli {
     /// Input file

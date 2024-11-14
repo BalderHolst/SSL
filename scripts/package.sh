@@ -5,6 +5,14 @@
 
 echo "->> Running 'demo-package'"
 # Dependencies for demo-package
+echo "--->> Running 'document'"
+# Dependencies for document
+
+# Run document task
+rm -rf target/doc
+cargo doc --no-deps
+
+
 echo "--->> Running 'demo-build'"
 # Dependencies for demo-build
 
@@ -14,10 +22,14 @@ wasm-pack build --target web "`git rev-parse --show-toplevel`/demo"
 
 # Run demo-package task
 root="`git rev-parse --show-toplevel`"
-mkdir -p "$root/demo/public"
-cp -rv "$root/demo/pkg" "$root/demo/public"
-cp -v "$root/demo/favicon.ico" "$root/demo/public"
-cp -v "$root/demo/index.html" "$root/demo/public"
-cp -v "$root/demo/styles.css" "$root/demo/public"
-cp -v "$root/demo/index.js" "$root/demo/public"
+output="$root/public"
+mkdir -p "$output"
+echo "Copying demo files to $output"
+cp -r "$root/demo/pkg" "$output"
+cp "$root/demo/favicon.ico" "$output"
+cp "$root/demo/index.html" "$output"
+cp "$root/demo/styles.css" "$output"
+cp "$root/demo/index.js" "$output"
+echo "Copying documentation to $output/doc"
+cp -r "$root/target/doc" "$output/doc"
 

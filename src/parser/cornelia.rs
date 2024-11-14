@@ -1,8 +1,11 @@
+//! Just a file containing the `Cornelia` expression (a heart).
+
 use crate::{
     ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, ParenExpr},
     text::Span,
 };
 
+/// Generate the Cornelia (heart) expression.
 pub fn cornelia_expr(span: Span) -> Expr {
     let expr = |kind: ExprKind| Expr {
         kind,

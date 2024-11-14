@@ -4,10 +4,12 @@ use image::{self, Rgb, RgbImage};
 
 use crate::{ast::Expr, evaluator::eval};
 
+/// Convert a f64 color to a u8 color
 fn f64_color_to_u8(color: f64) -> u8 {
     (color * (u8::MAX as f64)) as u8
 }
 
+/// Normalize coordinates from pixel space to -1.0 to 1.0
 fn normalize(x: u32, y: u32, width: u32, height: u32) -> (f64, f64) {
     let nx = (x as f64) / (width as f64) * 2.0 - 1.0;
     let ny = (y as f64) / (height as f64) * 2.0 - 1.0;
