@@ -40,7 +40,7 @@ cargo build --release --manifest-path "`git rev-parse --show-toplevel`/././Cargo
 
 # Run check-examples task
 ls ./examples | xargs -I{} bash -c \
-    "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast | diff - tests/{}.ast || exit 1" \
+    "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast --dry-run | diff - tests/{}.ast || exit 1" \
     || { echo "Example AST has changed." ; exit 1 ; }
 
 

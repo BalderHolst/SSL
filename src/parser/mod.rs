@@ -16,9 +16,6 @@ pub struct Parser {
     seed: usize,
 }
 
-const DEFAULT_EXPR_KIND: ExprKind = ExprKind::Number(1.0);
-const DEFAULT_BIN_OP: BinOp = BinOp::Mul;
-
 /// Choose an expression based on a weighted choice and a seed number.
 macro_rules! choice {
     ($n:expr, $($w:expr => $res:expr),*$(,)?) => {{ (|| {
@@ -33,6 +30,55 @@ macro_rules! choice {
         )*
         unreachable!()
     })() }};
+}
+
+impl Parser {
+    fn choose_token(&mut self) -> Expr {
+        let mut span = Span {
+            start: self.source.len() - 1,
+            end: self.source.len() - 1,
+        };
+
+        let (n, f) = match self.current() {
+            Some(t) => {
+                span = t.span.clone();
+                (t.kind.as_usize(), t.kind.as_f64())
+            }
+            None => (self.seed(), ((self.seed() as f64) / 3.3) % 1.0),
+        };
+
+        let expr = |kind: ExprKind| Expr {
+            kind,
+            span: span.clone(),
+        };
+
+        let l = self.looking_for.len() + 1;
+        choice! { n + self.seed(),
+            3/l => self.parse_color(),
+            1/(l*3) => self.parse_parenthesized_expr(),
+            4 => expr(ExprKind::X),
+            4 => expr(ExprKind::Y),
+            3 => expr(ExprKind::Number(f)),
+            2 => self.parse_if_expr(),
+            0 => self.parse_neg_expr(),
+        }
+    }
+
+    fn choose_binop(&mut self, seed: usize) -> BinOp {
+        choice! {seed + self.seed(),
+            7 => BinOp::Add,
+            7 => BinOp::Sub,
+            9 => BinOp::Mul,
+            9 => BinOp::Div,
+            9 => BinOp::Mod,
+            6 => BinOp::Pow,
+            1 => BinOp::And,
+            1 => BinOp::Or,
+            1 => BinOp::LessThan,
+            1 => BinOp::GreaterThan,
+            0 => BinOp::Equal,
+        }
+    }
 }
 
 #[allow(dead_code)] // TODO: Find a better solution
@@ -72,18 +118,34 @@ impl Parser {
         self.tokens.get(self.cursor)
     }
 
+    fn consume_whitespace(&mut self) {
+        while self
+            .current()
+            .map_or(false, |t| t.kind == TokenKind::Whitespace)
+        {
+            self.cursor += 1;
+        }
+    }
+
     fn consume(&mut self) -> Option<Token> {
         let token = self.current()?.clone();
         self.cursor += 1;
-        while self.current()?.kind == TokenKind::Whitespace {
-            self.cursor += 1;
-        }
-        // println!("TK: {:?}", &token.kind);
+        self.consume_whitespace();
         Some(token)
     }
 
+    fn current_span(&self) -> Span {
+        match self.current() {
+            Some(t) => t.span.clone(),
+            None => Span {
+                start: self.source.len() - 1,
+                end: self.source.len() - 1,
+            },
+        }
+    }
+
     fn parse_color(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
 
         self.consume(); // Consume left brace
 
@@ -108,14 +170,14 @@ impl Parser {
         Expr {
             kind: ExprKind::Color(ColorExpr::new(r, g, b)),
             span: Span {
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
                 start: start_span.start,
+                end: end.map_or(self.source.len() - 1, |t| t.span.end),
             },
         }
     }
 
     fn parse_neg_expr(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
         self.consume(); // Consume '-'
         let inner = self.parse_expr();
         let end = self.peak(-1);
@@ -130,7 +192,7 @@ impl Parser {
     }
 
     fn parse_abs_expr(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
 
         self.consume(); // Consume left |
 
@@ -150,7 +212,7 @@ impl Parser {
     }
 
     fn parse_if_expr(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
 
         self.consume(); // Consume 'if'
 
@@ -175,14 +237,14 @@ impl Parser {
         Expr {
             kind: ExprKind::If(IfExpr::new(cond, true_expr, false_expr)),
             span: Span {
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
                 start: start_span.start,
+                end: end.map_or(self.source.len() - 1, |t| t.span.end),
             },
         }
     }
 
     fn parse_parenthesized_expr(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
 
         self.consume(); // Consume left parenthesis
 
@@ -202,7 +264,7 @@ impl Parser {
     }
 
     fn parse_cornelia(&mut self) -> Expr {
-        let start_span = self.current().unwrap().span.clone();
+        let start_span = self.current_span();
 
         let len = "Cornelia".len();
 
@@ -216,19 +278,14 @@ impl Parser {
         cornelia::cornelia_expr(span)
     }
 
-    fn is_done(&self) -> bool {
+    fn is_done(&mut self) -> bool {
+        self.consume_whitespace();
         self.cursor >= self.tokens.len()
     }
 
     fn parse_primary_expr(&mut self) -> Expr {
         let Some(token) = self.current() else {
-            return Expr {
-                kind: DEFAULT_EXPR_KIND,
-                span: Span {
-                    start: self.source.len(),
-                    end: self.source.len(),
-                },
-            };
+            return self.choose_token();
         };
 
         let token_span = token.span.clone();
@@ -278,27 +335,13 @@ impl Parser {
             {
                 self.parse_cornelia()
             }
-            tk => {
-                let n = tk.as_usize();
-                let number = tk.as_f64();
-                let looked_for = self.looking_for.len() + 1;
-                choice! { n + self.seed(),
-                    3/looked_for => self.parse_color(),
-                    1/(looked_for*3) => self.parse_parenthesized_expr(),
-                    4 => expr(ExprKind::X),
-                    4 => expr(ExprKind::Y),
-                    3 => expr(ExprKind::Number(number)),
-                    2 => self.parse_if_expr(),
-                    0 => self.parse_neg_expr(),
-                }
-            }
+            _ => self.choose_token(),
         }
     }
 
     fn get_bin_op(&mut self) -> BinOp {
-        let seed = self.seed();
         let Some(token) = self.current() else {
-            return DEFAULT_BIN_OP;
+            return self.choose_binop(0);
         };
         match &token.kind {
             TokenKind::Plus => BinOp::Add,
@@ -312,20 +355,7 @@ impl Parser {
             TokenKind::Less => BinOp::LessThan,
             TokenKind::Greater => BinOp::GreaterThan,
             TokenKind::Equal => BinOp::Equal,
-            tk => choice! {tk.as_usize() + seed,
-                7 => BinOp::Add,
-                7 => BinOp::Sub,
-                9 => BinOp::Mul,
-                9 => BinOp::Div,
-                9 => BinOp::Mod,
-                6 => BinOp::Pow,
-
-                1 => BinOp::And,
-                1 => BinOp::Or,
-                1 => BinOp::LessThan,
-                1 => BinOp::GreaterThan,
-                0 => BinOp::Equal,
-            },
+            tk => self.choose_binop(tk.as_usize()),
         }
     }
 
