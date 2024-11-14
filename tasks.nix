@@ -47,7 +47,7 @@ rec {
     record-examples = mkTask "record-examples" {
         script = /*bash*/ ''
             ls ./examples | xargs -I{} bash -c \
-                "mkdir -p tests/ ; echo 'Recording example {}' ; ./target/release/ssl examples/{} --ast > tests/{}.ast"
+                "mkdir -p tests/ ; echo 'Recording example {}' ; ./target/release/ssl examples/{} --ast --dry-run > tests/{}.ast"
             '';
         depends = [ build ];
     };
