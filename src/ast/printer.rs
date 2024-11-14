@@ -139,4 +139,12 @@ impl Visitor for Printer {
     fn visit_y_expr(&mut self) {
         vprintln!(self, "Y")
     }
+
+    fn visit_r_expr(&mut self) {
+        vprintln!(self, "R")
+    }
+
+    fn visit_a_expr(&mut self) {
+        vprintln!(self, "A")
+    }
 }

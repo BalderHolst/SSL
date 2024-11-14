@@ -14,9 +14,11 @@ pub trait Visitor {
             super::ExprKind::Cos(e) => self.visit_cos_expr(e),
             super::ExprKind::Number(e) => self.visit_number_expr(e),
             super::ExprKind::Color(e) => self.visit_color_expr(e),
+            super::ExprKind::If(e) => self.visit_if_expr(e),
             super::ExprKind::X => self.visit_x_expr(),
             super::ExprKind::Y => self.visit_y_expr(),
-            super::ExprKind::If(e) => self.visit_if_expr(e),
+            super::ExprKind::R => self.visit_r_expr(),
+            super::ExprKind::A => self.visit_a_expr(),
         }
     }
 
@@ -76,4 +78,6 @@ pub trait Visitor {
     fn visit_color_expr(&mut self, expr: &super::ColorExpr);
     fn visit_x_expr(&mut self);
     fn visit_y_expr(&mut self);
+    fn visit_r_expr(&mut self);
+    fn visit_a_expr(&mut self);
 }

@@ -70,6 +70,8 @@ impl Parser {
             1/l => self.parse_cos_expr(),
             4 => expr(ExprKind::X),
             4 => expr(ExprKind::Y),
+            2 => expr(ExprKind::R),
+            2 => expr(ExprKind::A),
             num => expr(ExprKind::Number(f)),
             l.min(2) => self.parse_if_expr(),
             0 => self.parse_neg_expr(),
@@ -109,7 +111,7 @@ impl Parser {
             source,
             cursor: 0,
             looking_for: vec![],
-            seed: 10,
+            seed: 0,
             not_number: 0,
         }
     }
@@ -365,6 +367,14 @@ impl Parser {
                 self.consume();
                 expr(ExprKind::Y)
             }
+            TokenKind::R => {
+                self.consume();
+                expr(ExprKind::R)
+            }
+            TokenKind::A => {
+                self.consume();
+                expr(ExprKind::A)
+            }
             TokenKind::Number(n) => {
                 let n = *n;
                 self.consume();
@@ -383,12 +393,12 @@ impl Parser {
                     self.peak(7).map(|t| &t.kind),
                 ) == (
                     Some(&TokenKind::Other('o')),
-                    Some(&TokenKind::Other('r')),
+                    Some(&TokenKind::R),
                     Some(&TokenKind::Other('n')),
                     Some(&TokenKind::Other('e')),
                     Some(&TokenKind::Other('l')),
                     Some(&TokenKind::Other('i')),
-                    Some(&TokenKind::Other('a')),
+                    Some(&TokenKind::A),
                 ) =>
             {
                 self.parse_cornelia()

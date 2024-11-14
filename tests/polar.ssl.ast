@@ -1,0 +1,36 @@
+Expr "{
+    r < 0.5,
+    a > r/2,
+    a
+}":
+  ColorExpr:
+    R:
+      Expr "r < 0.5":
+        BinExpr:
+          operation: LessThan
+          left:
+            Expr "r":
+              R
+          right:
+            Expr "0.5":
+              NumberExpr: 0.5
+    G:
+      Expr "a > r/2":
+        BinExpr:
+          operation: GreaterThan
+          left:
+            Expr "a":
+              A
+          right:
+            Expr "r/2":
+              BinExpr:
+                operation: Div
+                left:
+                  Expr "r":
+                    R
+                right:
+                  Expr "2":
+                    NumberExpr: 2.0
+    B:
+      Expr "a":
+        A

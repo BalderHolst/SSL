@@ -1,5 +1,6 @@
 use std::{
     cmp::Ordering,
+    f64::consts::PI,
     ops::{Add, Div, Mul, Sub},
 };
 
@@ -344,6 +345,8 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
         ExprKind::Number(n) => number!(*n),
         ExprKind::X => number!(x),
         ExprKind::Y => number!(y),
+        ExprKind::R => number!(f64::sqrt(x * x + y * y)),
+        ExprKind::A => number!(f64::atan(y / x) / PI),
         ExprKind::If(e) => {
             let cond = eval_expr(&e.cond, x, y);
             if cond.as_bool() {

@@ -40,6 +40,8 @@ impl Display for Expr {
             ExprKind::Number(n) => write!(f, "{n}"),
             ExprKind::X => write!(f, "X"),
             ExprKind::Y => write!(f, "Y"),
+            ExprKind::R => write!(f, "R"),
+            ExprKind::A => write!(f, "A"),
         }
     }
 }
@@ -57,6 +59,8 @@ pub enum ExprKind {
     Cos(CosExpr),
     X,
     Y,
+    R,
+    A,
 }
 
 #[derive(Debug)]

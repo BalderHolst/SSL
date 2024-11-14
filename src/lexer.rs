@@ -29,9 +29,11 @@ pub enum TokenKind {
     Bar,
     And,
 
+    Number(f64),
     X,
     Y,
-    Number(f64),
+    R,
+    A,
 
     Comma,
 
@@ -49,36 +51,39 @@ pub enum TokenKind {
 }
 
 impl TokenKind {
+    #[rustfmt::skip]
     pub fn as_usize(&self) -> usize {
         match self {
-            TokenKind::X => 0,
-            TokenKind::Y => 1,
-            TokenKind::Plus => 2,
-            TokenKind::Minus => 3,
-            TokenKind::Asterisk => 4,
-            TokenKind::Slash => 5,
-            TokenKind::Procent => 6,
-            TokenKind::Less => 7,
-            TokenKind::Greater => 8,
-            TokenKind::Equal => 9,
-            TokenKind::Exclamation => 10,
-            TokenKind::Carrot => 11,
-            TokenKind::Lparen => 12,
-            TokenKind::Rparen => 13,
-            TokenKind::Lbrace => 14,
-            TokenKind::Rbrace => 15,
-            TokenKind::Bar => 16,
-            TokenKind::And => 17,
-            TokenKind::Comma => 18,
-            TokenKind::Whitespace => 19,
-            TokenKind::Sin => 20,
-            TokenKind::Cos => 21,
-            TokenKind::If => 22,
-            TokenKind::Then => 23,
-            TokenKind::Else => 24,
-            TokenKind::End => 25,
-            TokenKind::Number(n) => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
-            TokenKind::Other(c) => (*c) as usize,
+            TokenKind::X           => 0,
+            TokenKind::Y           => 1,
+            TokenKind::A           => 2,
+            TokenKind::R           => 3,
+            TokenKind::Plus        => 4,
+            TokenKind::Minus       => 5,
+            TokenKind::Asterisk    => 6,
+            TokenKind::Slash       => 7,
+            TokenKind::Procent     => 8,
+            TokenKind::Less        => 9,
+            TokenKind::Greater     => 10,
+            TokenKind::Equal       => 11,
+            TokenKind::Exclamation => 12,
+            TokenKind::Carrot      => 13,
+            TokenKind::Lparen      => 14,
+            TokenKind::Rparen      => 15,
+            TokenKind::Lbrace      => 16,
+            TokenKind::Rbrace      => 17,
+            TokenKind::Bar         => 18,
+            TokenKind::And         => 19,
+            TokenKind::Comma       => 20,
+            TokenKind::Whitespace  => 21,
+            TokenKind::Sin         => 22,
+            TokenKind::Cos         => 23,
+            TokenKind::If          => 24,
+            TokenKind::Then        => 25,
+            TokenKind::Else        => 26,
+            TokenKind::End         => 27,
+            TokenKind::Number(n)   => ((n.abs() % 1.0) * (usize::MAX as f64)) as usize,
+            TokenKind::Other(c)    => (*c) as usize,
         }
     }
 
@@ -164,6 +169,8 @@ impl Iterator for Lexer {
             '!' => token(self, TokenKind::Exclamation),
             'x' | 'X' => token(self, TokenKind::X),
             'y' | 'Y' => token(self, TokenKind::Y),
+            'a' | 'A' => token(self, TokenKind::A),
+            'r' | 'R' => token(self, TokenKind::R),
             '0'..='9' => {
                 let mut number = String::new();
                 while let Some(c) = self.current() {

@@ -34,7 +34,7 @@ Expr "{
       Expr "sin(|x+y|*10),
 }":
         BinExpr:
-          operation: Pow
+          operation: Mod
           left:
             Expr "sin(|x+y|*10),":
               Expr "|x+y|*10":
@@ -57,4 +57,4 @@ Expr "{
                       NumberExpr: 10.0
           right:
             Expr "}":
-              Y
+              R
