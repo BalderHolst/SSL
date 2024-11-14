@@ -147,10 +147,7 @@ impl Lexer {
                 return false;
             }
         }
-        match self.source.get(cursor).copied().map(|c| c as char) {
-            Some(c) if c.is_ascii_digit() => true,
-            _ => false,
-        }
+        matches!(self.source.get(cursor).copied().map(|c| c as char), Some(c) if c.is_ascii_digit())
     }
 }
 

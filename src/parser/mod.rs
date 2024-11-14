@@ -171,38 +171,38 @@ impl Parser {
     fn parse_color(&mut self) -> Expr {
         let start_span = self.current_span();
 
-        self.consume(); // Consume left brace
+        self.consume_if(|tk| *tk == TokenKind::Lbrace);
 
         self.looking_for.push(TokenKind::Comma);
         let r = self.parse_expr();
         self.looking_for.pop();
 
-        self.consume(); // Consume comma
+        self.consume_if(|tk| *tk == TokenKind::Comma);
 
         self.looking_for.push(TokenKind::Comma);
         let g = self.parse_expr();
         self.looking_for.pop();
 
-        self.consume(); // Consume comma
+        self.consume_if(|tk| *tk == TokenKind::Comma);
 
         self.looking_for.push(TokenKind::Rbrace);
         let b = self.parse_expr();
         self.looking_for.pop();
 
-        let end = self.consume(); // Consume right brace
+        self.consume_if(|tk| *tk == TokenKind::Rbrace);
 
         Expr {
             kind: ExprKind::Color(ColorExpr::new(r, g, b)),
             span: Span {
                 start: start_span.start,
-                end: end.map_or(self.source.len(), |t| t.span.end),
+                end: self.current_span().start,
             },
         }
     }
 
     fn parse_neg_expr(&mut self) -> Expr {
         let start_span = self.current_span();
-        self.consume(); // Consume '-'
+        self.consume_if(|tk| *tk == TokenKind::Minus);
         let inner = self.parse_expr();
         let end = self.peak(-1);
 
@@ -218,19 +218,19 @@ impl Parser {
     fn parse_abs_expr(&mut self) -> Expr {
         let start_span = self.current_span();
 
-        self.consume(); // Consume left |
+        self.consume_if(|tk| *tk == TokenKind::Bar);
 
         self.looking_for.push(TokenKind::Bar);
         let inner = self.parse_expr();
         self.looking_for.pop();
 
-        let end = self.consume(); // Consume right |
+        self.consume_if(|tk| *tk == TokenKind::Bar);
 
         Expr {
             kind: ExprKind::Abs(AbsExpr::new(inner)),
             span: Span {
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
                 start: start_span.start,
+                end: self.current_span().start,
             },
         }
     }
@@ -239,14 +239,13 @@ impl Parser {
         let start_span = self.current_span();
         self.consume(); // Consume function name
 
-        // Consume '('
         self.consume_if(|tk| *tk == TokenKind::Lparen);
 
         self.looking_for.push(TokenKind::Rparen);
         let inner = self.parse_expr();
         self.looking_for.pop();
 
-        self.consume(); // Consume ')'
+        self.consume_if(|tk| *tk == TokenKind::Rparen); // Consume ')'
 
         Expr {
             kind: kind(inner),
@@ -268,32 +267,32 @@ impl Parser {
     fn parse_if_expr(&mut self) -> Expr {
         let start_span = self.current_span();
 
-        self.consume(); // Consume 'if'
+        self.consume_if(|tk| *tk == TokenKind::If);
 
         self.looking_for.push(TokenKind::Then);
         self.not_number += 1;
         let cond = self.parse_expr();
         self.looking_for.pop();
 
-        self.consume(); // Consume 'then'
+        self.consume_if(|tk| *tk == TokenKind::Then);
 
         self.looking_for.push(TokenKind::Else);
         let true_expr = self.parse_expr();
         self.looking_for.pop();
 
-        self.consume(); // Consume 'else'
+        self.consume_if(|tk| *tk == TokenKind::Else);
 
         self.looking_for.push(TokenKind::End);
         let false_expr = self.parse_expr();
         self.looking_for.pop();
 
-        let end = self.consume(); // Consume 'end'
+        self.consume_if(|tk| *tk == TokenKind::End);
 
         Expr {
             kind: ExprKind::If(IfExpr::new(cond, true_expr, false_expr)),
             span: Span {
                 start: start_span.start,
-                end: end.map_or(self.source.len(), |t| t.span.end),
+                end: self.current_span().start,
             },
         }
     }
@@ -301,19 +300,19 @@ impl Parser {
     fn parse_parenthesized_expr(&mut self) -> Expr {
         let start_span = self.current_span();
 
-        self.consume(); // Consume left parenthesis
+        self.consume_if(|tk| *tk == TokenKind::Lparen);
 
         self.looking_for.push(TokenKind::Rparen);
         let inner = self.parse_expr();
         self.looking_for.pop();
 
-        let end = self.consume(); // Consume right parenthesis
+        self.consume_if(|tk| *tk == TokenKind::Rparen);
 
         Expr {
             kind: ExprKind::Paren(ParenExpr::new(inner)),
             span: Span {
-                end: end.map_or(self.source.len() - 1, |t| t.span.end),
                 start: start_span.start,
+                end: self.current_span().start,
             },
         }
     }
