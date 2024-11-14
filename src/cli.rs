@@ -24,6 +24,10 @@ pub struct Cli {
     #[arg(short, long)]
     pub verbose: bool,
 
+    /// Do not render the image
+    #[arg(long)]
+    pub dry_run: bool,
+
     /// Print the generated expression
     #[arg(long("expr"))]
     pub print_expr: bool,

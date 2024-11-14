@@ -33,7 +33,10 @@ fn main() {
 
     if opts.print_ast {
         expr.print_ast(source);
-        exit(0);
+    }
+
+    if opts.dry_run {
+        return;
     }
 
     const PARTS: u32 = 10;

@@ -55,7 +55,7 @@ rec {
     check-examples = mkTask "check-examples" {
         script = /*bash*/ ''
             ls ./examples | xargs -I{} bash -c \
-                "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast | diff - tests/{}.ast || exit 1" \
+                "echo 'Checking example {}' ; ./target/release/ssl examples/{} --ast --dry-run | diff - tests/{}.ast || exit 1" \
                 || { echo "Example AST has changed." ; exit 1 ; }
             '';
         depends = [ build ];
