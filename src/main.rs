@@ -27,8 +27,12 @@ fn main() {
     let mut parser = parser::Parser::new(tokens, source.clone());
     let expr = parser.parse_expr();
 
+    if opts.print_expr {
+        println!("{}", expr);
+    }
+
     if opts.print_ast {
-        expr.print(source);
+        expr.print_ast(source);
         exit(0);
     }
 

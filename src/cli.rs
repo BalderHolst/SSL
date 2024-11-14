@@ -24,6 +24,10 @@ pub struct Cli {
     #[arg(short, long)]
     pub verbose: bool,
 
+    /// Print the generated expression
+    #[arg(long("expr"))]
+    pub print_expr: bool,
+
     /// Print the generated AST
     #[arg(long("ast"))]
     pub print_ast: bool,

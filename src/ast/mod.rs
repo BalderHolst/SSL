@@ -1,8 +1,11 @@
-use std::rc::Rc;
-
-use visitor::Visitor;
+use core::fmt;
+use std::{
+    fmt::{Display, Formatter},
+    rc::Rc,
+};
 
 use crate::text::Span;
+use visitor::Visitor;
 
 mod printer;
 mod visitor;
@@ -17,9 +20,25 @@ pub struct Expr {
 
 impl Expr {
     #[allow(dead_code)]
-    pub fn print(&self, source: Rc<Vec<u8>>) {
+    pub fn print_ast(&self, source: Rc<Vec<u8>>) {
         let mut printer = printer::Printer::new(source);
         printer.visit_expr(self);
+    }
+}
+
+impl Display for Expr {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match &self.kind {
+            ExprKind::Bin(e) => write!(f, "{:?}({}, {})", e.op, e.lhs, e.rhs),
+            ExprKind::Paren(e) => write!(f, "({})", e.inner),
+            ExprKind::Neg(e) => write!(f, "neg({})", e.inner),
+            ExprKind::Abs(e) => write!(f, "abs({})", e.inner),
+            ExprKind::Color(e) => write!(f, "{{{}, {}, {}}}", e.r, e.g, e.b),
+            ExprKind::If(e) => write!(f, "If({}, {}, {})", e.cond, e.true_expr, e.false_expr),
+            ExprKind::Number(n) => write!(f, "{n}"),
+            ExprKind::X => write!(f, "X"),
+            ExprKind::Y => write!(f, "Y"),
+        }
     }
 }
 
