@@ -90,7 +90,6 @@ impl Parser {
             1 => BinOp::Or,
             0 => BinOp::LessThan,
             0 => BinOp::GreaterThan,
-            0 => BinOp::Equal,
         }
     }
 }
@@ -426,7 +425,6 @@ impl Parser {
             TokenKind::And => BinOp::And,
             TokenKind::Less => BinOp::LessThan,
             TokenKind::Greater => BinOp::GreaterThan,
-            TokenKind::Equal => BinOp::Equal,
             tk => self.choose_binop(tk.as_usize()),
         }
     }

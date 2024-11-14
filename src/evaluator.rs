@@ -252,7 +252,6 @@ macro_rules! impl_bin_op {
 }
 impl_bin_op!(Result, less, <);
 impl_bin_op!(Result, greater, >);
-impl_bin_op!(Result, equal, ==);
 
 impl Result {
     fn pow(&self, other: Self) -> Self {
@@ -330,7 +329,6 @@ fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
                 BinOp::And => l.and(r),
                 BinOp::LessThan => l.less(r),
                 BinOp::GreaterThan => l.greater(r),
-                BinOp::Equal => l.equal(r),
             }
         }
         ExprKind::Color(c) => {

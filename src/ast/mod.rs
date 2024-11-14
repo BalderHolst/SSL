@@ -91,7 +91,6 @@ pub enum BinOp {
     Pow,
     LessThan,
     GreaterThan,
-    Equal,
     Or,
     And,
 }
@@ -101,7 +100,6 @@ impl BinOp {
         match self {
             Self::LessThan => 0,
             Self::GreaterThan => 0,
-            Self::Equal => 0,
             Self::Or => 0,
             Self::And => 0,
             Self::Add => 1,
