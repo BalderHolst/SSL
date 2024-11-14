@@ -6,7 +6,7 @@ It also does not run on the GPU... yet...
 Check out the [live demo](https://balderholst.github.io/SSL/)!
 
 ## Idea
-An ssl program, is an expression that maps an (x, y) coordinate to an RGB value (like a shader). A simple program may look like this
+An SSL program, is an expression that maps an (x, y) coordinate to an RGB value (like a shader). A simple program may look like this
 ```text
 {x, y, 0.0}
 ```
@@ -20,8 +20,10 @@ Check out the [examples](./examples/) to get an idea of the language syntax and 
 You know how JavaScript generates a semicolon if you forget to add one after a statement? SSL does the same, but for every situation where it encounters an invalid token. It then uses the value of the token it found to deterministtically pick a valid parsing path that. This means that you do not have to know the SSL language to generate a nice image, just give it some text and out pops an image.
 
 
-## Running Locally
-Clone the repository and compile with cargo.
+## Running the Code
+SSL runs in locally as well as in the browser with web assembly. Running locally is faster, as it utilizes multi threading when rendering the image.
+
+To run SSL locally, clone the repository and compile with cargo like so:
 ```bash
 git clone https://github.com/BalderHolst/ssl ssl
 cd ssl
