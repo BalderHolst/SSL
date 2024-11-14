@@ -32,6 +32,15 @@ cp target/release/ssl ssl
 ./ssl
 ```
 
+## Using as a Library
+The functionality of SSL is exposed as a Rust library, mainly because it is needed for use in the web assembly demo. The documentation can be found [here](https://balderholst.github.io/SSL/doc/ssl/).
+
+The library is simple. To use the library add the following to your dependencies in `Cargo.toml`.
+
+```toml
+ssl = { git = "https://github.com/BalderHolst/ssl" }
+```
+
 ## Inspiration
 This project was inspired by the ["Implementing Scientific Paper in C"](https://www.youtube.com/watch?v=3D_h2RE0o0E) livestream by [tsoding](https://github.com/tsoding). Which was about trying to implement "Hash Visualization" as described in [this scientific paper](http://users.ece.cmu.edu/~adrian/projects/validation/validation.pdf). I have taken some liberties and this project is not a replication of the paper.
 
