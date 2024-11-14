@@ -117,6 +117,20 @@ rec {
 
     gen-scripts = gen.gen-scripts "gen-scripts";
 
+    gen-random = mkTask "gen-random" {
+        script = /*bash*/ ''
+            # Get argument if provided
+            len=$1
+            if [ -z "$len" ]; then
+                len=50
+            fi
+
+            input="$(tr -dc A-Za-z0-9 </dev/urandom | head -c $len)"
+            echo "Running input: $input"
+            echo "$input" | cargo run -r -- /dev/stdin
+        '';
+    };
+
     pre-push = mkSeq "pre-push" [
         check-fmt
         check-clippy
