@@ -1,7 +1,7 @@
 //! Just a file containing the `Cornelia` expression (a heart).
 
-use crate::{
-    compiler::ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, ParenExpr},
+use crate::compiler::{
+    ast::{AbsExpr, BinExpr, BinOp, ColorExpr, Expr, ExprKind, IfExpr, ParenExpr},
     text::Span,
 };
 

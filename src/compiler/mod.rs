@@ -3,6 +3,7 @@ pub mod constant_evaluator;
 pub mod evaluator;
 pub mod lexer;
 pub mod parser;
+mod text;
 
 /// Compile source code into an expression
 #[allow(dead_code)] // TODO: Find a better solution

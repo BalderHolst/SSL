@@ -5,7 +5,6 @@ use std::{fs, process::exit, sync::mpsc, thread};
 mod cli;
 mod compiler;
 mod renderer;
-mod text;
 
 use compiler::parser;
 

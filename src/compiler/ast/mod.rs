@@ -6,8 +6,9 @@ use std::{
     rc::Rc,
 };
 
-use crate::text::Span;
 use visitor::Visitor;
+
+use super::text::Span;
 
 mod printer;
 mod visitor;

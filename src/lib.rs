@@ -4,7 +4,6 @@
 
 mod compiler;
 mod renderer;
-mod text;
 
 /// Create an image to be rendered into
 pub fn create_image(width: u32, height: u32) -> image::RgbImage {

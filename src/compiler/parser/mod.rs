@@ -4,8 +4,6 @@ use std::rc::Rc;
 
 mod cornelia;
 
-use crate::text::Span;
-
 use super::{
     ast::{
         self, AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr,
@@ -13,6 +11,7 @@ use super::{
     },
     constant_evaluator,
     lexer::{self, Token, TokenKind},
+    text::Span,
 };
 
 #[allow(dead_code)] // TODO: Find a better solution

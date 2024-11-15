@@ -2,7 +2,7 @@
 
 use std::rc::Rc;
 
-use crate::text::Span;
+use super::text::Span;
 
 /// A language token.
 #[derive(Debug, PartialEq, Clone)]
