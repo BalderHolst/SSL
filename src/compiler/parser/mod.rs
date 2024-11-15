@@ -7,7 +7,7 @@ mod cornelia;
 use super::{
     ast::{
         self, AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr,
-        ParenExpr, SinExpr,
+        ParenExpr, SinExpr, TransXExpr, TransYExpr,
     },
     constant_evaluator,
     lexer::{self, Token, TokenKind},
@@ -93,6 +93,8 @@ impl Parser {
             2/l => self.parse_parenthesized_expr(),
             1/l => self.parse_sin_expr(),
             1/l => self.parse_cos_expr(),
+            3/l => self.parse_translate_x_expr(),
+            3/l => self.parse_translate_y_expr(),
             4 => expr(ExprKind::X),
             4 => expr(ExprKind::Y),
             2 => expr(ExprKind::R),
@@ -268,7 +270,8 @@ impl Parser {
         }
     }
 
-    fn parse_function(&mut self, kind: impl FnOnce(Expr) -> ExprKind) -> Expr {
+    /// Parse function with one argument
+    fn parse_function1(&mut self, kind: impl FnOnce(Expr) -> ExprKind) -> Expr {
         let start_span = self.current_span();
         self.consume(); // Consume function name
 
@@ -289,12 +292,48 @@ impl Parser {
         }
     }
 
+    /// Parse function with two arguments
+    fn parse_function2(&mut self, kind: impl FnOnce(Expr, Expr) -> ExprKind) -> Expr {
+        let start_span = self.current_span();
+        self.consume(); // Consume function name
+
+        self.consume_if(|tk| *tk == TokenKind::Lparen);
+
+        self.looking_for.push(TokenKind::Comma);
+        let inner1 = self.parse_expr();
+        self.looking_for.pop();
+
+        self.consume_if(|tk| *tk == TokenKind::Comma);
+
+        self.looking_for.push(TokenKind::Rparen);
+        let inner2 = self.parse_expr();
+        self.looking_for.pop();
+
+        self.consume_if(|tk| *tk == TokenKind::Rparen); // Consume ')'
+
+        Expr {
+            kind: kind(inner1, inner2),
+            span: Span {
+                start: start_span.start,
+                end: self.current_span().end,
+            },
+        }
+    }
+
     fn parse_sin_expr(&mut self) -> Expr {
-        self.parse_function(|e| ExprKind::Sin(SinExpr::new(e)))
+        self.parse_function1(|e| ExprKind::Sin(SinExpr::new(e)))
     }
 
     fn parse_cos_expr(&mut self) -> Expr {
-        self.parse_function(|e| ExprKind::Cos(CosExpr::new(e)))
+        self.parse_function1(|e| ExprKind::Cos(CosExpr::new(e)))
+    }
+
+    fn parse_translate_x_expr(&mut self) -> Expr {
+        self.parse_function2(|x, y| ExprKind::TransX(TransXExpr::new(x, y)))
+    }
+
+    fn parse_translate_y_expr(&mut self) -> Expr {
+        self.parse_function2(|x, y| ExprKind::TransY(TransYExpr::new(x, y)))
     }
 
     fn parse_if_expr(&mut self) -> Expr {
@@ -411,6 +450,8 @@ impl Parser {
                 self.consume();
                 expr(ExprKind::Number(n))
             }
+            TokenKind::TX => self.parse_translate_x_expr(),
+            TokenKind::TY => self.parse_translate_y_expr(),
             TokenKind::Sin => self.parse_sin_expr(),
             TokenKind::Cos => self.parse_cos_expr(),
             TokenKind::Other('C') | TokenKind::Other('c')

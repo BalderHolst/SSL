@@ -50,6 +50,8 @@ impl Display for Expr {
             ExprKind::Color(e) => write!(f, "{{{}, {}, {}}}", e.r, e.g, e.b),
             ExprKind::If(e) => write!(f, "If({}, {}, {})", e.cond, e.true_expr, e.false_expr),
             ExprKind::Number(n) => write!(f, "{n}"),
+            ExprKind::TransX(e) => write!(f, "Tx({}, {})", e.trans, e.inner),
+            ExprKind::TransY(e) => write!(f, "Ty({}, {})", e.trans, e.inner),
             ExprKind::X => write!(f, "X"),
             ExprKind::Y => write!(f, "Y"),
             ExprKind::R => write!(f, "R"),
@@ -70,6 +72,8 @@ pub enum ExprKind {
     Abs(AbsExpr),
     Sin(SinExpr),
     Cos(CosExpr),
+    TransX(TransXExpr),
+    TransY(TransYExpr),
     X,
     Y,
     R,
@@ -109,6 +113,8 @@ impl Expr {
             | ExprKind::Abs(_)
             | ExprKind::Sin(_)
             | ExprKind::Cos(_)
+            | ExprKind::TransX(_)
+            | ExprKind::TransY(_)
             | ExprKind::X
             | ExprKind::Y
             | ExprKind::R
@@ -200,6 +206,38 @@ impl IfExpr {
             cond: Box::new(cond),
             true_expr: Box::new(true_expr),
             false_expr: Box::new(false_expr),
+        }
+    }
+}
+
+/// Translate expression in the x direction. Syntax: `tx(<trans>, <inner>)`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TransXExpr {
+    pub trans: Box<Expr>,
+    pub inner: Box<Expr>,
+}
+
+impl TransXExpr {
+    pub fn new(trans: Expr, inner: Expr) -> Self {
+        Self {
+            trans: Box::new(trans),
+            inner: Box::new(inner),
+        }
+    }
+}
+
+/// Translate expression in the y direction. Syntax: `ty(<trans>, <inner>)`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TransYExpr {
+    pub trans: Box<Expr>,
+    pub inner: Box<Expr>,
+}
+
+impl TransYExpr {
+    pub fn new(trans: Expr, inner: Expr) -> Self {
+        Self {
+            trans: Box::new(trans),
+            inner: Box::new(inner),
         }
     }
 }

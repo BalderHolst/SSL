@@ -38,6 +38,8 @@ pub enum TokenKind {
     Y,
     R,
     A,
+    TX,
+    TY,
 
     Comma,
 
@@ -63,6 +65,8 @@ impl TokenKind {
             TokenKind::Y           => 1,
             TokenKind::A           => 2,
             TokenKind::R           => 3,
+            TokenKind::TX          => 4,
+            TokenKind::TY          => 5,
             TokenKind::Plus        => 4,
             TokenKind::Minus       => 5,
             TokenKind::Asterisk    => 6,
@@ -197,10 +201,18 @@ impl Iterator for Lexer {
             '>' => token(self, TokenKind::Greater),
             '=' => token(self, TokenKind::Equal),
             '!' => token(self, TokenKind::Exclamation),
-            'x' | 'X' => token(self, TokenKind::X),
-            'y' | 'Y' => token(self, TokenKind::Y),
-            'a' | 'A' => token(self, TokenKind::A),
-            'r' | 'R' => token(self, TokenKind::R),
+            'x' => token(self, TokenKind::X),
+            'y' => token(self, TokenKind::Y),
+            'a' => token(self, TokenKind::A),
+            'r' => token(self, TokenKind::R),
+            't' if self.peak(1) == Some('x') => {
+                self.next();
+                token(self, TokenKind::TX)
+            }
+            't' if self.peak(1) == Some('y') => {
+                self.next();
+                token(self, TokenKind::TY)
+            }
             '0'..='9' if self.is_at_number() => {
                 let mut number = String::new();
                 while let Some(c) = self.current() {

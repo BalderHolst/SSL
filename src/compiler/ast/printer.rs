@@ -146,6 +146,20 @@ impl Visitor for Printer {
         self.unindent();
     }
 
+    fn visit_trans_x_expr(&mut self, expr: &super::TransXExpr) {
+        vprintln!(self, "TransXExpr:");
+        self.indent();
+        vprintln!(self, "Trans:");
+        self.indent();
+        self.visit_expr(&expr.trans);
+        self.unindent();
+        vprintln!(self, "Inner:");
+        self.indent();
+        self.visit_expr(&expr.inner);
+        self.unindent();
+        self.unindent();
+    }
+
     fn visit_x_expr(&mut self) {
         vprintln!(self, "X")
     }

@@ -3,7 +3,7 @@ mod tests;
 use super::{
     ast::{
         AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr,
-        SinExpr,
+        SinExpr, TransXExpr, TransYExpr,
     },
     evaluator,
 };
@@ -103,6 +103,34 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
                     kind: ExprKind::If(IfExpr::new(cond, true_expr, false_expr)),
                     span: expr.span,
                 }
+            }
+        }
+        ExprKind::TransX(e) => {
+            let trans = evaluate_constants(*e.trans);
+            let inner = evaluate_constants(*e.inner);
+
+            let expr = |trans: Expr, inner: Expr| Expr {
+                kind: ExprKind::TransX(TransXExpr::new(trans, inner)),
+                span: expr.span,
+            };
+
+            match (trans.is_constant(), inner.is_constant()) {
+                (true, true) => evaluate_constant_expr(&expr(trans, inner)),
+                _ => expr(trans, inner),
+            }
+        }
+        ExprKind::TransY(e) => {
+            let trans = evaluate_constants(*e.trans);
+            let inner = evaluate_constants(*e.inner);
+
+            let expr = |trans: Expr, inner: Expr| Expr {
+                kind: ExprKind::TransY(TransYExpr::new(trans, inner)),
+                span: expr.span,
+            };
+
+            match (trans.is_constant(), inner.is_constant()) {
+                (true, true) => evaluate_constant_expr(&expr(trans, inner)),
+                _ => expr(trans, inner),
             }
         }
         ExprKind::Neg(NegExpr { inner }) => {

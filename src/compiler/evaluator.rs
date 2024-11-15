@@ -334,6 +334,13 @@ impl Result {
     }
 }
 
+fn wrap(x: f64) -> f64 {
+    match x.is_sign_positive() {
+        true => (x + 1.0) % 2.0 - 1.0,
+        false => (x - 1.0) % 2.0 + 1.0,
+    }
+}
+
 /// Evaluate an expression at a point.
 pub(crate) fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
     let mut res = match &expr.kind {
@@ -363,6 +370,14 @@ pub(crate) fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
         ExprKind::Neg(e) => eval_expr(&e.inner, x, y) * number!(-1.0),
         ExprKind::Abs(e) => eval_expr(&e.inner, x, y).abs(),
         ExprKind::Number(n) => number!(*n),
+        ExprKind::TransX(e) => {
+            let offset = eval_expr(&e.trans, x, y).as_number();
+            eval_expr(&e.inner, wrap(x - offset), y)
+        }
+        ExprKind::TransY(e) => {
+            let offset = eval_expr(&e.trans, x, y).as_number();
+            eval_expr(&e.inner, x, wrap(y - offset))
+        }
         ExprKind::X => number!(x),
         ExprKind::Y => number!(y),
         ExprKind::R => number!(f64::sqrt(x * x + y * y)),
