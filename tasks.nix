@@ -19,10 +19,15 @@ let
         cargo build --release ${manifest-path dir}
     '';
 
+    cargo-test = dir: /*bash*/ ''
+        cargo test ${manifest-path dir} || exit 1
+    '';
+
 in
 rec { 
 
     build = mkTask "build" { script = cargo-build "./."; };
+    test = mkTask "test-ssl" { script = cargo-test "./."; };
 
     document-lib = mkTask "document" { script = /*bash*/ ''
         rm -rf target/doc
@@ -151,6 +156,7 @@ rec {
         check-fmt
         check-clippy
         check-examples
+        test
         generate-readme-image
         demo-generate-favicon
         (task-lib.gen.check-no-uncommited "Please commit your changes before pushing.")
