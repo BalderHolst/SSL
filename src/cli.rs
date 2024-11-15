@@ -16,11 +16,11 @@ pub struct Cli {
     pub output: String,
 
     /// Width of the output image
-    #[arg(short('W'), long, default_value = "1080")]
+    #[arg(short('W'), long, default_value = "1200")]
     pub width: u32,
 
     /// Height of the output image
-    #[arg(short('H'), long, default_value = "1080")]
+    #[arg(short('H'), long, default_value = "1200")]
     pub height: u32,
 
     /// Threads
