@@ -10,6 +10,21 @@ body {
     /* height: 100vh; */
 }
 
+h1 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 0;
+}
+
+.desc {
+    text-align: center;
+    font-size: 1em;
+}
+
+a {
+    color: #099;
+}
+
 .wrapper {
     /* Center children horizontally */
     max-width: 800px;
