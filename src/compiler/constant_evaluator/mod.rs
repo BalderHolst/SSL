@@ -109,6 +109,18 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
             let trans = evaluate_constants(*e.trans);
             let inner = evaluate_constants(*e.inner);
 
+            match (&trans.kind, &inner.kind) {
+                (t, _) if t.is_zero() => return inner,
+                (_, i) if i.is_constant() => return inner,
+                (ExprKind::X, ExprKind::X) => {
+                    return Expr {
+                        kind: ExprKind::Number(0.5),
+                        span: expr.span,
+                    }
+                }
+                _ => {}
+            }
+
             let expr = |trans: Expr, inner: Expr| Expr {
                 kind: ExprKind::TransX(TransXExpr::new(trans, inner)),
                 span: expr.span,
@@ -122,6 +134,18 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         ExprKind::TransY(e) => {
             let trans = evaluate_constants(*e.trans);
             let inner = evaluate_constants(*e.inner);
+
+            match (&trans.kind, &inner.kind) {
+                (t, _) if t.is_zero() => return inner,
+                (_, i) if i.is_constant() => return inner,
+                (ExprKind::Y, ExprKind::A) | (ExprKind::Y, ExprKind::Y) => {
+                    return Expr {
+                        kind: ExprKind::Number(0.5),
+                        span: expr.span,
+                    }
+                }
+                _ => {}
+            }
 
             let expr = |trans: Expr, inner: Expr| Expr {
                 kind: ExprKind::TransY(TransYExpr::new(trans, inner)),

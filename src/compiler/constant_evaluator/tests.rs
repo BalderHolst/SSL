@@ -68,3 +68,10 @@ test_syntax!( greater_true:  "2.0 > 1.0" => "1.0"  );
 test_syntax!( greater_false: "1.0 > 2.0" => "-1.0" );
 test_syntax!( or:            "1.0 | 0.0" => "1.0"  );
 test_syntax!( and:           "1.0 & 0.0" => "0.0"  );
+
+// Translate Operatoins
+test_syntax!( trans_x_zero:       "tx(0.0, x)" => "x"   );
+test_syntax!( trans_y_zero:       "ty(0.0, y)" => "y"   );
+test_syntax!( trans_x_zero_inner: "tx(x, 0.0)" => "0.0" );
+test_syntax!( trans_y_zero_inner: "ty(y, 0.0)" => "0.0" );
+test_syntax!( trans_x_x:          "tx(x, x)"   => "0.5" );

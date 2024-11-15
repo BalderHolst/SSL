@@ -97,11 +97,9 @@ impl ExprKind {
             _ => false,
         }
     }
-}
 
-impl Expr {
     pub fn is_constant(&self) -> bool {
-        match &self.kind {
+        match self {
             ExprKind::Number(_) => true,
             ExprKind::Color(ColorExpr { r, g, b }) => {
                 r.is_constant() && g.is_constant() && b.is_constant()
@@ -120,6 +118,12 @@ impl Expr {
             | ExprKind::R
             | ExprKind::A => false,
         }
+    }
+}
+
+impl Expr {
+    pub fn is_constant(&self) -> bool {
+        self.kind.is_constant()
     }
 }
 
