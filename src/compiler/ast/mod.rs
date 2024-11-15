@@ -94,6 +94,28 @@ impl ExprKind {
     }
 }
 
+impl Expr {
+    pub fn is_constant(&self) -> bool {
+        match &self.kind {
+            ExprKind::Number(_) => true,
+            ExprKind::Color(ColorExpr { r, g, b }) => {
+                r.is_constant() && g.is_constant() && b.is_constant()
+            }
+            ExprKind::Bin(_)
+            | ExprKind::If(_)
+            | ExprKind::Paren(_)
+            | ExprKind::Neg(_)
+            | ExprKind::Abs(_)
+            | ExprKind::Sin(_)
+            | ExprKind::Cos(_)
+            | ExprKind::X
+            | ExprKind::Y
+            | ExprKind::R
+            | ExprKind::A => false,
+        }
+    }
+}
+
 /// Color expression. Syntax: `{r, g, b}`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ColorExpr {

@@ -4,7 +4,7 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 
-use crate::ast::{BinOp, Expr, ExprKind};
+use crate::compiler::ast::{BinOp, Expr, ExprKind};
 
 /// Result of evaluating an expression.
 #[derive(Clone, Debug, PartialEq, PartialOrd)]

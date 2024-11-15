@@ -2,7 +2,7 @@
 
 use image::{self, Rgb, RgbImage};
 
-use crate::{ast::Expr, evaluator::eval};
+use crate::compiler::{ast::Expr, evaluator::eval};
 
 /// Convert a f64 color to a u8 color
 fn f64_color_to_u8(color: f64) -> u8 {

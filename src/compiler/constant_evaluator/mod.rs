@@ -1,14 +1,13 @@
 mod tests;
 
-use std::fmt::Binary;
+use crate::text::Span;
 
-use crate::{
+use super::{
     ast::{
         AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr,
         SinExpr,
     },
-    evaluator::{self, eval},
-    text::Span,
+    evaluator,
 };
 
 type Constant = evaluator::Result;
@@ -41,26 +40,6 @@ impl ExprResult {
     }
 }
 
-fn is_constant(expr: &Expr) -> bool {
-    match &expr.kind {
-        ExprKind::Number(_) => true,
-        ExprKind::Color(ColorExpr { r, g, b }) => {
-            is_constant(r) && is_constant(g) && is_constant(b)
-        }
-        ExprKind::Bin(_)
-        | ExprKind::If(_)
-        | ExprKind::Paren(_)
-        | ExprKind::Neg(_)
-        | ExprKind::Abs(_)
-        | ExprKind::Sin(_)
-        | ExprKind::Cos(_)
-        | ExprKind::X
-        | ExprKind::Y
-        | ExprKind::R
-        | ExprKind::A => false,
-    }
-}
-
 fn evaluate_constant_expr(expr: &Expr) -> Expr {
     let result = evaluator::eval_expr(&expr, 0.0, 0.0);
     let expr = |kind| Expr {
@@ -87,11 +66,11 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
             let mut l_const = false;
             let mut r_const = false;
 
-            if is_constant(&lhs) {
+            if lhs.is_constant() {
                 l_const = true;
                 lhs = evaluate_constant_expr(&lhs);
             }
-            if is_constant(&rhs) {
+            if rhs.is_constant() {
                 r_const = true;
                 rhs = evaluate_constant_expr(&rhs);
             }
@@ -146,7 +125,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
             let true_expr = evaluate_constants(*e.true_expr);
             let false_expr = evaluate_constants(*e.false_expr);
 
-            if is_constant(&cond) {
+            if cond.is_constant() {
                 match evaluator::eval_expr(&cond, 0.0, 0.0).as_bool() {
                     true => true_expr,
                     false => false_expr,
@@ -160,7 +139,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         }
         ExprKind::Neg(NegExpr { inner }) => {
             let inner = evaluate_constants(*inner);
-            let is_const = is_constant(&inner);
+            let is_const = inner.is_constant();
             let expr = Expr {
                 kind: ExprKind::Neg(NegExpr::new(inner)),
                 span: expr.span,
@@ -172,7 +151,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         }
         ExprKind::Abs(AbsExpr { inner }) => {
             let inner = evaluate_constants(*inner);
-            let is_const = is_constant(&inner);
+            let is_const = inner.is_constant();
             let expr = Expr {
                 kind: ExprKind::Abs(AbsExpr::new(inner)),
                 span: expr.span,
@@ -184,7 +163,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         }
         ExprKind::Sin(SinExpr { inner }) => {
             let inner = evaluate_constants(*inner);
-            let is_const = is_constant(&inner);
+            let is_const = inner.is_constant();
             let expr = Expr {
                 kind: ExprKind::Sin(SinExpr::new(inner)),
                 span: expr.span,
@@ -196,7 +175,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         }
         ExprKind::Cos(CosExpr { inner }) => {
             let inner = evaluate_constants(*inner);
-            let is_const = is_constant(&inner);
+            let is_const = inner.is_constant();
             let expr = Expr {
                 kind: ExprKind::Cos(CosExpr::new(inner)),
                 span: expr.span,
@@ -208,7 +187,7 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
         }
         ExprKind::Paren(ParenExpr { inner }) => {
             let inner = evaluate_constants(*inner);
-            let is_const = is_constant(&inner);
+            let is_const = inner.is_constant();
             let expr = Expr {
                 kind: ExprKind::Paren(ParenExpr::new(inner)),
                 span: expr.span,
@@ -222,13 +201,13 @@ pub fn evaluate_constants(expr: Expr) -> Expr {
             let mut r = evaluate_constants(*c.r);
             let mut g = evaluate_constants(*c.g);
             let mut b = evaluate_constants(*c.b);
-            if is_constant(&r) {
+            if r.is_constant() {
                 r = evaluate_constant_expr(&r);
             }
-            if is_constant(&g) {
+            if g.is_constant() {
                 g = evaluate_constant_expr(&g);
             }
-            if is_constant(&b) {
+            if b.is_constant() {
                 b = evaluate_constant_expr(&b);
             }
             Expr {

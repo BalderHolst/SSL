@@ -2,10 +2,7 @@
 
 #![warn(missing_docs)]
 
-mod ast;
-mod evaluator;
-mod lexer;
-mod parser;
+mod compiler;
 mod renderer;
 mod text;
 
@@ -16,7 +13,7 @@ pub fn create_image(width: u32, height: u32) -> image::RgbImage {
 
 pub use renderer::{render, render_in_parts, render_into, render_part_into};
 
-pub use parser::parse_source;
+pub use compiler::parser::parse_source;
 
 /// Generate an image from a source string
 pub fn generate(source: String, width: u32, height: u32) -> image::RgbImage {

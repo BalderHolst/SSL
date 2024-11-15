@@ -4,14 +4,37 @@ use std::rc::Rc;
 
 mod cornelia;
 
-use crate::{
+use crate::text::Span;
+
+use super::{
     ast::{
         self, AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr,
         ParenExpr, SinExpr,
     },
+    constant_evaluator,
     lexer::{self, Token, TokenKind},
-    text::Span,
 };
+
+#[allow(dead_code)] // TODO: Find a better solution
+const MAX_TRIES: usize = 100;
+
+#[allow(dead_code)] // TODO: Find a better solution
+pub fn parse_tokens(tokens: Vec<Token>, source: Rc<Vec<u8>>, on_retry: impl Fn()) -> ast::Expr {
+    let mut parser = Parser::new(tokens, source);
+    let mut expr = parser.parse_expr();
+    for retry in 1..MAX_TRIES {
+        expr = constant_evaluator::evaluate_constants(expr);
+
+        if !expr.is_constant() {
+            break;
+        }
+        on_retry();
+        parser.reset();
+        parser.seed = retry;
+        expr = parser.parse_expr();
+    }
+    expr
+}
 
 /// Parser for SSL
 pub struct Parser {
@@ -117,6 +140,13 @@ impl Parser {
             seed: 0,
             not_number: 0,
         }
+    }
+
+    fn reset(&mut self) {
+        self.cursor = 0;
+        self.looking_for.clear();
+        self.seed = 0;
+        self.not_number = 0;
     }
 
     fn peak(&self, offset: isize) -> Option<&Token> {
