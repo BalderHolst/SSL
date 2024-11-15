@@ -55,7 +55,7 @@ echo "--->> Running 'generate-readme-image'"
 
 # Run generate-readme-image task
 root="`git rev-parse --show-toplevel`"
-cargo run -- "$root/README.md" -W 500 -H 500 --output "$root/readme.png"
+cargo run -- "$root/README.md" -W 700 -H 700 --output "$root/readme.png"
 
 
 echo "--->> Running 'demo-generate-favicon'"

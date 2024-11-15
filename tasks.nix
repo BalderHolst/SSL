@@ -126,7 +126,7 @@ rec {
     generate-readme-image = mkTask "generate-readme-image" {
         script = /*bash*/ ''
             root="`${root}`"
-            cargo run -- "$root/README.md" -W 500 -H 500 --output "$root/readme.png"
+            cargo run -- "$root/README.md" -W 700 -H 700 --output "$root/readme.png"
         '';
     };
 
