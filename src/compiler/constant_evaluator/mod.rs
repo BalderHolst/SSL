@@ -1,7 +1,5 @@
 mod tests;
 
-use crate::text::Span;
-
 use super::{
     ast::{
         AbsExpr, BinExpr, BinOp, ColorExpr, CosExpr, Expr, ExprKind, IfExpr, NegExpr, ParenExpr,
@@ -10,38 +8,8 @@ use super::{
     evaluator,
 };
 
-type Constant = evaluator::Result;
-
-enum ExprResult {
-    Const { value: Constant, span: Span },
-    Dyn(Expr),
-}
-
-impl ExprResult {
-    fn to_expr(self) -> Expr {
-        match self {
-            ExprResult::Const { value, span } => {
-                let expr = |kind| Expr {
-                    kind,
-                    span: span.clone(),
-                };
-                match value {
-                    evaluator::Result::Color(c) => expr(ExprKind::Color(ColorExpr::new(
-                        expr(ExprKind::Number(c.r)),
-                        expr(ExprKind::Number(c.g)),
-                        expr(ExprKind::Number(c.b)),
-                    ))),
-                    evaluator::Result::Number(n) => expr(ExprKind::Number(n)),
-                    evaluator::Result::Bool(_) => expr(ExprKind::Number(value.as_number())),
-                }
-            }
-            ExprResult::Dyn(e) => e,
-        }
-    }
-}
-
 fn evaluate_constant_expr(expr: &Expr) -> Expr {
-    let result = evaluator::eval_expr(&expr, 0.0, 0.0);
+    let result = evaluator::eval_expr(expr, 0.0, 0.0);
     let expr = |kind| Expr {
         kind,
         span: expr.span.clone(),
