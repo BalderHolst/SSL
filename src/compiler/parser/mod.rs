@@ -89,12 +89,12 @@ impl Parser {
         };
 
         choice! { n + self.seed(),
-            5/l => self.parse_color(),
+            10/(l*l) => self.parse_color(),
             2/l => self.parse_parenthesized_expr(),
             1/l => self.parse_sin_expr(),
             1/l => self.parse_cos_expr(),
-            3/l => self.parse_translate_x_expr(),
-            3/l => self.parse_translate_y_expr(),
+            2/l => self.parse_translate_x_expr(),
+            2/l => self.parse_translate_y_expr(),
             4 => expr(ExprKind::X),
             4 => expr(ExprKind::Y),
             2 => expr(ExprKind::R),
