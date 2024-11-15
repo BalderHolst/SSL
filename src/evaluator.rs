@@ -8,7 +8,7 @@ use crate::ast::{BinOp, Expr, ExprKind};
 
 /// Result of evaluating an expression.
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
-pub enum Result {
+pub(crate) enum Result {
     Color(Color),
     Number(f64),
     Bool(bool),
@@ -49,7 +49,7 @@ macro_rules! bool {
 
 impl Result {
     /// Cast the result to a number.
-    fn as_number(&self) -> f64 {
+    pub fn as_number(&self) -> f64 {
         match self {
             Result::Color(c) => (c.r + c.g + c.b) / 3.0,
             Result::Number(n) => *n,
@@ -58,7 +58,7 @@ impl Result {
     }
 
     /// Cast the result to a color.
-    fn as_color(&self) -> Color {
+    pub fn as_color(&self) -> Color {
         match self {
             Result::Color(c) => c.clone(),
             Result::Number(n) => Color {
@@ -75,7 +75,7 @@ impl Result {
     }
 
     /// Cast the result to a boolean.
-    fn as_bool(&self) -> bool {
+    pub fn as_bool(&self) -> bool {
         match self {
             Result::Color(_) => self.as_number() >= 0.0,
             Result::Number(n) => *n >= 0.0,
@@ -334,8 +334,8 @@ impl Result {
     }
 }
 
-/// Evaluate an expression.
-fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
+/// Evaluate an expression at a point.
+pub(crate) fn eval_expr(expr: &Expr, x: f64, y: f64) -> Result {
     let mut res = match &expr.kind {
         ExprKind::Bin(e) => {
             let l = eval_expr(&e.lhs, x, y);

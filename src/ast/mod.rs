@@ -22,6 +22,12 @@ pub struct Expr {
     pub span: Span,
 }
 
+impl PartialEq for Expr {
+    fn eq(&self, other: &Self) -> bool {
+        self.kind == other.kind
+    }
+}
+
 impl Expr {
     /// Print the AST of the expression. This is a lot of output.
     #[allow(dead_code)]
@@ -52,7 +58,7 @@ impl Display for Expr {
 }
 
 /// The kind of an expression.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ExprKind {
     Bin(BinExpr),
     If(IfExpr),
@@ -69,8 +75,27 @@ pub enum ExprKind {
     A,
 }
 
+impl ExprKind {
+    pub fn is_zero(&self) -> bool {
+        match self {
+            Self::Number(n) => *n == 0.0,
+            Self::Color(ColorExpr { r, g, b }) => {
+                r.kind.is_zero() && g.kind.is_zero() && b.kind.is_zero()
+            }
+            _ => false,
+        }
+    }
+
+    pub fn is_one(&self) -> bool {
+        match self {
+            Self::Number(n) => *n == 1.0,
+            _ => false,
+        }
+    }
+}
+
 /// Color expression. Syntax: `{r, g, b}`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ColorExpr {
     pub r: Box<Expr>,
     pub g: Box<Expr>,
@@ -88,7 +113,7 @@ impl ColorExpr {
 }
 
 /// Operator for binary expressions. The precedence is used to determine the order of operations.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BinOp {
     Add,
     Sub,
@@ -121,7 +146,7 @@ impl BinOp {
 }
 
 /// A binary expression.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BinExpr {
     pub op: BinOp,
     pub lhs: Box<Expr>,
@@ -139,7 +164,7 @@ impl BinExpr {
 }
 
 /// An if expression. Syntax: `if <cond> then <true_expr> else <false_expr>`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct IfExpr {
     pub cond: Box<Expr>,
     pub true_expr: Box<Expr>,
@@ -160,7 +185,7 @@ impl IfExpr {
 macro_rules! wrapper_expr {
     ($name:ident: $doc:literal) => {
         #[doc = $doc]
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, PartialEq)]
         pub struct $name {
             pub inner: Box<Expr>,
         }

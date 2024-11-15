@@ -4,6 +4,7 @@ use std::{fs, process::exit, sync::mpsc, thread};
 
 mod ast;
 mod cli;
+mod constant_evaluator;
 mod evaluator;
 mod lexer;
 mod parser;
@@ -34,6 +35,8 @@ fn main() {
 
     let mut parser = parser::Parser::new(tokens, source.clone());
     let expr = parser.parse_expr();
+
+    let expr = constant_evaluator::evaluate_constants(expr);
 
     if opts.print_expr {
         println!("{}", expr);
