@@ -2,8 +2,8 @@ macro_rules! test_syntax {
     ($name:ident: $input:literal => $output:literal) => {
         #[test]
         fn $name() {
-            let input_expr = $crate::parser::parse_source($input.to_string());
-            let output_expr = $crate::parser::parse_source($output.to_string());
+            let input_expr = $crate::compiler::parser::parse_source($input.to_string());
+            let output_expr = $crate::compiler::parser::parse_source($output.to_string());
             println!("{}: {} => {}", stringify!($name), input_expr, output_expr);
             let input_expr = super::evaluate_constants(input_expr);
             let output_expr = super::evaluate_constants(output_expr);
