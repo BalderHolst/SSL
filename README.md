@@ -21,7 +21,7 @@ The output of an expression can be *any* floating point number. To find the RGB 
 Check out the [examples](./examples/) to get an idea of the language syntax and operations.
 
 ### Any Program is a Valid Program!
-You know how JavaScript generates a semicolon if you forget to add one after a statement? SSL does the same, but for every situation where it encounters an invalid token. It then uses the value of the token it found to deterministtically pick a valid parsing path that. This means that you do not have to know the SSL language to generate a nice image, just give it some text and out pops an image.
+You know how JavaScript generates a semicolon if you forget to add one after a statement? SSL does the same, but for every situation where it encounters an invalid token! It then uses the value of the token it found to deterministtically pick a valid parsing path. This means that you do not have to know the SSL language to generate a nice image, just give it some text and out pops an image!
 
 
 ## Running the Code
