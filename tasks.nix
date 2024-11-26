@@ -145,9 +145,11 @@ rec {
                 len=50
             fi
 
+            shift
+
             input="$(tr -dc A-Za-z0-9 </dev/urandom | head -c $len)"
             echo "Running input: $input"
-            echo "$input" | cargo run -r -- /dev/stdin
+            echo "$input" | cargo run -r -- /dev/stdin $@
         '';
     };
 

@@ -16,7 +16,7 @@ fn normalize(x: u32, y: u32, width: u32, height: u32) -> (f64, f64) {
     (nx, ny)
 }
 
-/// Render subimage
+/// Render sub-image defined by and x- and y-range
 pub fn render_subimage(
     expr: &Expr,
     x: (u32, u32),
