@@ -16,7 +16,7 @@ An SSL program, is an expression that maps an (x, y) coordinate to an RGB value 
 ```
 When this expression is evaluated on every pixel of an image, it creates a nice gradient where the red channel changes with `x` and the green channel changes with `y`. The blue channel is constant. `x` and `y` are in the space from -1 to 1.
 
-The output of an expression can be *any* floating point number. To find the RGB value of each pixel, the expression output it clamped between 0 and 1 with a function defined in [the evaluator](./src/evaluator.rs). I do not guarantee that this function stays the same in the future.
+The output of an expression can be *any* floating point number. To find the RGB value of each pixel, the expression output it clamped between 0 and 1 with a function defined in [the evaluator](./src/compiler/evaluator.rs). I do not guarantee that this function stays the same in the future.
 
 Check out the [examples](./examples/) to get an idea of the language syntax and operations.
 
